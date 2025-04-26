@@ -79,7 +79,7 @@ async def generate_html_stream(content, generation_id):
             },
             {
             "role": "assistant",
-            "content": "Understood, here's the requested site: ```html\n"
+            "content": "Understood, here's the markdown content: ```\n"
             }
         ]
         
