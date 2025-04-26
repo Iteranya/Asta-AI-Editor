@@ -11,7 +11,6 @@ db = ProjectDB()
 # Pydantic model for request/response
 class ProjectCreate(BaseModel):
     title: str
-    slug: str
     description: Optional[str] = None
     ai_notes: Optional[str] = None
     markdown: Optional[str] = None

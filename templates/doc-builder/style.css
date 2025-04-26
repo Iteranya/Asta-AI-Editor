@@ -774,3 +774,38 @@ textarea#markdown-input:focus {
     height: 60px;
     animation: spin 1s linear infinite;
 }
+
+/* Add this to your CSS file */
+.top-right-button-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+  }
+  
+  .action-button {
+    padding: 10px 15px;
+    background-color: var(--accent-primary);
+    color: var(--bg-secondary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(255, 58, 58, 0.3);
+    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+  }
+  
+  .action-button:hover {
+    background-color: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 58, 58, 0.4);
+  }
+  
+  .action-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 3px 8px rgba(255, 58, 58, 0.3);
+  }

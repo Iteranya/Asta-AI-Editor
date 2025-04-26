@@ -24,14 +24,20 @@ router = APIRouter()
 
 
 @router.get("/doc-builder", response_class=HTMLResponse)
-async def get_html():
+async def get_html(request: Request):
     # Path to template and scripts
     template_path = "templates/doc-builder/index.html"
+    slug = request.query_params.get("slug", "")
     
     # Read HTML template
     with open(template_path, "r") as f:
         html = f.read()
-
+   
+    # Insert the slug value into the invisible container
+    html = html.replace(
+        '<div id="slug-container" style="display: none;" data-slug=""></div>', 
+        f'<div id="slug-container" style="display: none;" data-slug="{slug}">{slug}</div>'
+    )
     return html
 
 @router.post("/edit-text")
