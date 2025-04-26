@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Markdown Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --bg-primary: #1a1d24;
+            --bg-secondary: #282c34;
+            --bg-tertiary: #3a3f4b;
+            --text-primary: #abb2bf;
+            --text-secondary: #888c95;
+            --accent-primary: #61afef;
+            --accent-secondary: #c678dd;
+            --accent-success: #98c379;
+            --accent-error: #e06c75;
+            --border-color: #3e4451;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --scrollbar-thumb: #4b5263;
+            --scrollbar-thumb-hover: #61afef;
+            --font-primary: 'Poppins', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        ::selection {
+            background-color: var(--accent-primary);
+            color: var(--bg-secondary);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column; /* Changed to column */
+            justify-content: flex-start; /* Align items to the top */
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        .main-container {
+            display: flex;
+            width: 95%;
+            max-width: 1800px; /* Increased max-width */
+            height: calc(90vh - 150px); /* Adjusted height to make space for AI section */
+            background-color: var(--bg-secondary);
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-top: 2vh; /* Added margin top */
+        }
+
+        .pane {
+            flex: 1;
+            padding: 35px; /* Increased padding */
+            overflow-y: auto;
+            box-sizing: border-box;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .pane::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .pane::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        .pane::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 3px solid var(--bg-secondary); /* Creates padding around thumb */
+        }
+
+        .pane::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        .left-pane {
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .right-pane {
+            background-color: var(--bg-tertiary);
+        }
+
+        .pane-title {
+            position: sticky;
+            top: -35px;
+            left: -35px;
+            padding: 18px 35px; /* Increased padding */
+            background-color: inherit;
+            border-bottom: 1px solid var(--border-color);
+            margin: -35px -35px 25px -35px; /* Adjusted margins */
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 12px; /* Increased gap */
+            backdrop-filter: blur(5px); /* Subtle blur effect */
+            background-color: rgba(40, 44, 52, 0.8); /* Semi-transparent background for sticky title */
+        }
+
+        .pane-title i {
+            font-size: 1.1em; /* Slightly larger icon */
+            color: var(--accent-primary);
+        }
+
+        textarea#markdown-input {
+            width: 100%;
+            height: calc(100% - 75px); /* Adjusted height */
+            border: none;
+            padding: 20px; /* Increased padding */
+            font-family: var(--font-code);
+            font-size: 15px; /* Increased font size */
+            line-height: 1.7; /* Increased line height */
+            resize: none;
+            background-color: #21252b; /* Slightly different dark shade */
+            color: var(--text-primary);
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        textarea#markdown-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(97, 175, 239, 0.2); /* Adjusted focus shadow */
+        }
+
+        #markdown-output {
+            line-height: 1.8; /* Increased line height */
+            color: var(--text-primary);
+            word-wrap: break-word;
+        }
+
+        /* Enhanced Markdown specific styles */
+        #markdown-output h1, #markdown-output h2 {
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 0.4em;
+            margin-top: 1.8em;
+            margin-bottom: 1em;
+            color: var(--accent-secondary); /* Different color for top headers */
+        }
+         #markdown-output h3, #markdown-output h4, #markdown-output h5, #markdown-output h6 {
+            margin-top: 1.6em;
+            margin-bottom: 0.9em;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+            line-height: 1.4;
+        }
+        #markdown-output h1 { font-size: 2.2em; font-weight: 700; }
+        #markdown-output h2 { font-size: 1.9em; font-weight: 600; }
+        #markdown-output h3 { font-size: 1.6em; font-weight: 600; }
+        #markdown-output h4 { font-size: 1.3em; font-weight: 600; }
+        #markdown-output h5 { font-size: 1.15em; font-weight: 600; }
+        #markdown-output h6 { font-size: 1em; color: var(--text-secondary); font-weight: 600; }
+
+        #markdown-output p {
+            margin-bottom: 1.3em;
+        }
+
+        #markdown-output a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease, text-decoration 0.3s ease, background-color 0.3s ease;
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+        }
+        #markdown-output a:hover {
+            color: var(--bg-secondary);
+            background-color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        #markdown-output code:not(pre code) {
+            background-color: var(--bg-secondary);
+            padding: 0.3em 0.5em; /* Increased padding */
+            border-radius: 5px; /* Smoother radius */
+            font-family: var(--font-code);
+            font-size: 0.95em;
+            color: var(--accent-success); /* Greenish color for inline code */
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output pre {
+            background-color: #21252b; /* Consistent dark bg */
+            color: var(--text-primary);
+            padding: 1.2em; /* Increased padding */
+            border-radius: 10px; /* Smoother radius */
+            overflow-x: auto;
+            margin-bottom: 1.5em; /* Increased margin */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output pre code.hljs { /* Target hljs class specifically */
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-family: var(--font-code);
+            font-size: 0.95em; /* Slightly larger code font */
+            line-height: 1.6; /* Adjusted line height */
+            color: inherit;
+        }
+
+        #markdown-output blockquote {
+            border-left: 6px solid var(--accent-secondary); /* Thicker border with secondary accent */
+            padding: 15px 25px; /* Increased padding */
+            margin: 1.8em 0; /* Increased margin */
+            background-color: rgba(40, 44, 52, 0.5); /* Semi-transparent background */
+            color: var(--text-secondary);
+            font-style: normal; /* Removing italic for better readability */
+            border-radius: 0 8px 8px 0; /* Rounded corners */
+        }
+        #markdown-output blockquote p {
+            margin-bottom: 0.6em;
+        }
+        #markdown-output blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        #markdown-output ul, #markdown-output ol {
+            margin-left: 30px; /* Increased indent */
+            margin-bottom: 1.3em;
+            padding-left: 20px; /* Increased padding */
+        }
+        #markdown-output ul li, #markdown-output ol li {
+            margin-bottom: 0.7em; /* Increased spacing */
+        }
+        #markdown-output ul li::marker {
+             color: var(--accent-primary); /* Colored bullets */
+             font-size: 1.1em;
+        }
+         #markdown-output ol li::marker {
+             color: var(--accent-secondary); /* Colored numbers */
+             font-weight: 600;
+        }
+
+
+        #markdown-output table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for spacing and radius */
+            border-spacing: 0;
+            margin-bottom: 1.8em; /* Increased margin */
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* Rounded table corners */
+            overflow: hidden; /* Ensure radius is applied */
+        }
+        #markdown-output th, #markdown-output td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 15px; /* Increased padding */
+            text-align: left;
+        }
+        #markdown-output th {
+            background-color: var(--bg-tertiary); /* Darker header */
+            font-weight: 700; /* Bolder header */
+            color: var(--text-primary);
+            border-bottom-width: 2px; /* Thicker bottom border for headers */
+        }
+        #markdown-output tr:last-child td {
+             border-bottom: none; /* Remove border for last row */
+        }
+        #markdown-output tr:nth-child(even) td {
+            background-color: rgba(40, 44, 52, 0.3); /* Subtle striping */
+        }
+        #markdown-output tr:hover td {
+            background-color: rgba(97, 175, 239, 0.1); /* Hover effect */
+        }
+
+
+        #markdown-output img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px; /* Smoother radius */
+            margin: 1.2em 0; /* Increased margin */
+            box-shadow: 0 5px 15px var(--shadow-color); /* Subtle shadow */
+            display: block; /* Ensure block display for centering */
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output hr {
+            border: 0;
+            height: 2px; /* Thicker separator */
+            background-image: linear-gradient(to right, rgba(62, 68, 81, 0), var(--border-color), rgba(62, 68, 81, 0)); /* Fading gradient */
+            margin: 2.5em 0; /* Increased margin */
+        }
+
+        /* Placeholder text style */
+        #markdown-input::placeholder {
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        /* AI Generation Section */
+        .ai-section {
+            width: 95%;
+            max-width: 1800px; /* Match main container */
+            margin-top: 20px;
+            padding: 25px;
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .ai-section form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ai-section textarea#ai-prompt {
+            width: 100%;
+            min-height: 60px; /* Adjusted height */
+            padding: 15px;
+            font-family: var(--font-primary);
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical; /* Allow vertical resize */
+            background-color: #21252b;
+            color: var(--text-primary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+         .ai-section textarea#ai-prompt:focus {
+            border-color: var(--accent-secondary); /* Different focus color */
+            box-shadow: 0 0 0 4px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section textarea#ai-prompt::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .ai-section button {
+            padding: 12px 25px;
+            font-family: var(--font-primary);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--bg-secondary);
+            background-color: var(--accent-secondary); /* Use secondary accent for button */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            align-self: flex-end; /* Align button to the right */
+            box-shadow: 0 4px 10px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section button:hover:not(:disabled) {
+            background-color: #d18ce0; /* Lighter shade on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(198, 120, 221, 0.3);
+        }
+
+        .ai-section button:active:not(:disabled) {
+            transform: translateY(0px);
+            box-shadow: 0 3px 8px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section button:disabled {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .ai-section button .fa-spinner {
+            animation: fa-spin 1s linear infinite;
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* Completion Effect & Notifications */
+        .completion-effect, .notification {
+            position: fixed;
+            bottom: 30px; /* Increased bottom margin */
+            left: 50%;
+            transform: translateX(-50%) translateY(100px); /* Start off-screen */
+            background-color: rgba(152, 195, 121, 0.95); /* Success color */
+            color: #1a1d24; /* Dark text for contrast */
+            padding: 12px 25px; /* Increased padding */
+            border-radius: 25px; /* More rounded */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1001; /* Ensure above other elements */
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease-out; /* Smooth bounce effect */
+        }
+
+        .notification.error {
+             background-color: rgba(224, 108, 117, 0.95); /* Error color */
+             color: #ffffff; /* Light text */
+        }
+
+        .show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .hide {
+             transform: translateX(-50%) translateY(10px); /* Slight move down before fade */
+             opacity: 0;
+             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="pane left-pane">
+            <div class="pane-title">
+                <i class="fas fa-file-alt"></i> Raw Markdown
+            </div>
+            <textarea id="markdown-input" placeholder="Start typing your Markdown here..."></textarea>
+        </div>
+        <div class="pane right-pane">
+            <div class="pane-title">
+                <i class="fas fa-eye"></i> Preview
+            </div>
+            <div id="markdown-output"></div>
+        </div>
+    </div>
+
+    <div class="ai-section">
+        <form id="ai-form">
+            <textarea id="ai-prompt" name="content" placeholder="Describe what you want the AI to add or modify in the Markdown document... (e.g., 'Add a section about project setup instructions', 'Rewrite the introduction to be more engaging', 'Generate a table comparing features A, B, and C')"></textarea>
+            <button type="submit">
+                <i class="fas fa-wand-magic-sparkles"></i> Generate with AI
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Initialize marked library
+        marked.setOptions({
+            renderer: new marked.Renderer(),
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                // Use highlightElement within a pre > code structure for consistency
+                // We return the code as is, and highlightElement will be called later
+                return `<pre><code class="language-${language}">${hljs.highlight(code, { language, ignoreIllegals: true }).value}</code></pre>`;
+            },
+            pedantic: false,
+            gfm: true, // Enable GitHub Flavored Markdown
+            breaks: true, // Enable GFM line breaks (\n becomes <br>) - often useful
+            sanitize: false, // IMPORTANT: Set to true if dealing with untrusted input from external sources
+            smartLists: true,
+            smartypants: false,
+            xhtml: false
+        });
+
+        const markdownInput = document.getElementById('markdown-input');
+        const markdownOutput = document.getElementById('markdown-output');
+
+        // Initial placeholder content (more elaborate)
+        const initialMarkdown = `# Welcome to the AI-Powered Markdown Editor! ✨
+
+This editor allows you to write Markdown and see a live preview. You can also use the AI feature below to generate or modify content.
+
+## Features
+
+*   **Live Preview:** See your rendered Markdown instantly.
+*   **Syntax Highlighting:** Code blocks are automatically highlighted.
+*   **GitHub Flavored Markdown (GFM):** Supports tables, task lists, etc.
+*   **AI Generation:** Describe changes and let the AI write Markdown for you!
+
+---
+
+## Examples
+
+### Code Block (JavaScript)
+
+\`\`\`javascript
+// Simple fetch example
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(\`HTTP error! status: \${response.status}\`);
+    }
+    const data = await response.json();
+    console.log('Data received:', data);
+    return data;
+  } catch (error) {
+    console.error('Could not fetch data:', error);
+  }
+}
+
+fetchData('https://jsonplaceholder.typicode.com/todos/1');
+\`\`\`
+
+### Blockquote
+
+> "The best way to predict the future is to invent it."
+> _– Alan Kay_
+
+### Table
+
+| Feature         | Status      | Priority | Notes                   |
+|-----------------|-------------|----------|-------------------------|
+| Live Preview    | ✅ Complete | High     | Core functionality      |
+| Syntax Highlight| ✅ Complete | High     | Using highlight.js      |
+| AI Integration  | ✅ Complete | Medium   | Connected to backend    |
+| Sync Scrolling  | ✅ Complete | Low      | Enhances usability      |
+| Theme Options   | ⏳ Planned  | Low      | Future enhancement      |
+
+### Task List
+
+- [x] Setup basic HTML structure
+- [x] Implement Markdown parsing with Marked.js
+- [x] Add syntax highlighting with Highlight.js
+- [ ] Integrate AI generation form
+- [ ] Implement AI streaming response handling
+
+---
+
+**Try editing this content or use the AI prompt below!**
+`;
+
+        markdownInput.value = initialMarkdown;
+
+        // Function to update the preview
+        function updatePreview() {
+            const markdownText = markdownInput.value;
+            try {
+                // marked.parse now includes the <pre><code> structure with highlighting
+                markdownOutput.innerHTML = marked.parse(markdownText);
+                // No need to call highlightElement again here as marked.parse handles it
+            } catch (error) {
+                console.error("Error parsing Markdown:", error);
+                markdownOutput.innerHTML = `<p style="color: var(--accent-error);">Error parsing Markdown. Please check your syntax.</p>`;
+            }
+        }
+
+        // Event listener for input changes
+        markdownInput.addEventListener('input', updatePreview);
+
+        // Initial rendering
+        updatePreview();
+
+        // --- Synchronize scrolling (optional but nice) ---
+        let isSyncingLeftScroll = false;
+        let isSyncingRightScroll = false;
+        let syncTimeout;
+
+        const syncScroll = (source, target, isSyncingSourceFlag, setIsSyncingTargetFlag) => {
+            clearTimeout(syncTimeout);
+             if (isSyncingSourceFlag) {
+                // If this scroll event was triggered by the other pane, reset the flag and do nothing
+                if (source === markdownInput) isSyncingLeftScroll = false;
+                else isSyncingRightScroll = false;
+                return;
+            }
+
+            // Debounce the scroll syncing slightly
+            syncTimeout = setTimeout(() => {
+                 const sourceScrollHeight = source.scrollHeight - source.clientHeight;
+                 const targetScrollHeight = target.scrollHeight - target.clientHeight;
+
+                 // Avoid division by zero and unnecessary calculations
+                 if (sourceScrollHeight <= 0 || targetScrollHeight <= 0) return;
+
+                 const scrollPercentage = source.scrollTop / sourceScrollHeight;
+                 const targetScrollTop = scrollPercentage * targetScrollHeight;
+
+                 // Set the flag for the target before programmatically scrolling
+                 setIsSyncingTargetFlag(true);
+                 target.scrollTop = targetScrollTop;
+
+                 // Add a small delay before resetting the flag to avoid immediate reciprocal sync
+                 // This helps prevent jerky behavior in some browsers
+                 setTimeout(() => setIsSyncingTargetFlag(false), 50);
+            }, 20); // 20ms debounce time
+        };
+
+        markdownInput.addEventListener('scroll', () => {
+            syncScroll(markdownInput, markdownOutput, isSyncingLeftScroll, (val) => isSyncingRightScroll = val);
+        });
+
+        markdownOutput.addEventListener('scroll', () => {
+            syncScroll(markdownOutput, markdownInput, isSyncingRightScroll, (val) => isSyncingLeftScroll = val);
+        });
+
+        // --- AI Generation Functionality ---
+
+        /**
+         * Shows a temporary notification message.
+         * @param {string} message - The message to display.
+         * @param {'success' | 'error'} type - The type of notification.
+         */
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message; // Use innerHTML to allow basic formatting like icons
+            document.body.appendChild(notification);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                notification.classList.add('show');
+            });
+
+            // Auto-hide after a delay
+            setTimeout(() => {
+                notification.classList.remove('show');
+                notification.classList.add('hide');
+                // Remove from DOM after fade out animation
+                setTimeout(() => notification.remove(), 300);
+            }, 3000); // Show for 3 seconds
+        }
+
+
+        /**
+         * Initialize the AI generation functionality
+         * @param {HTMLTextAreaElement} markdownEditor - The Markdown editor element
+         * @param {Function} updatePreviewCallback - Callback to update the preview
+         */
+        function initAiGeneration(markdownEditor, updatePreviewCallback) {
+            const form = document.getElementById('ai-form'); // Use ID selector
+            const promptTextarea = document.getElementById('ai-prompt');
+
+            if (!form || !promptTextarea) {
+                console.error("AI form or prompt textarea not found!");
+                return;
+            }
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const button = form.querySelector('button');
+                const originalButtonText = button.innerHTML;
+                const promptValue = promptTextarea.value.trim();
+
+                if (!promptValue) {
+                    showNotification('Please enter a prompt for the AI.', 'error');
+                    promptTextarea.focus();
+                    return;
+                }
+
+                // Show loading state
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+                // Prepare data for the backend
+                // We'll send the current markdown and the prompt separately
+                const currentMarkdown = markdownEditor.value;
+                const requestData = {
+                    current_markdown: currentMarkdown,
+                    prompt: promptValue
+                };
+
+                try {
+                    // STEP 1: Send request to initiate generation
+                    // NOTE: Update '/generate-markdown' to your actual FastAPI endpoint URL
+                    const response = await fetch('/generate-markdown', { // <--- CHANGE ENDPOINT IF NEEDED
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestData) // Send as JSON
+                    });
+
+                    if (!response.ok) {
+                         let errorMsg = 'Failed to initiate AI generation.';
+                         try {
+                            const errorData = await response.json();
+                            errorMsg = errorData.detail || errorMsg;
+                         } catch (jsonError) {
+                            // Ignore if response is not JSON
+                         }
+                         throw new Error(errorMsg);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.id) {
+                        // STEP 2: Connect to the streaming endpoint
+                        // NOTE: Update `/stream/${data.id}` if your streaming endpoint is different
+                        const eventSource = new EventSource(`/stream/${data.id}`); // <--- CHANGE ENDPOINT IF NEEDED
+                        let generatedMarkdown = ''; // Store the incoming stream
+                        let isFirstChunk = true;
+
+                        // Append a clear indicator before starting the stream
+                        markdownEditor.value += "\n\n<!-- AI Generated Content Below -->\n";
+                        updatePreviewCallback(); // Update preview immediately
+
+                        eventSource.onmessage = function(event) {
+                            try {
+                                const eventData = JSON.parse(event.data);
+
+                                if (eventData.markdown_chunk) { // Expecting 'markdown_chunk' key
+                                    generatedMarkdown += eventData.markdown_chunk;
+                                    // Append chunk to the textarea
+                                    markdownEditor.value += eventData.markdown_chunk;
+
+                                    // Scroll to the bottom of the textarea
+                                    markdownEditor.scrollTop = markdownEditor.scrollHeight;
+
+                                    // Update preview in real-time (can be performance intensive)
+                                    // Consider debouncing this if needed for very long streams
+                                    updatePreviewCallback();
+                                    isFirstChunk = false;
+                                }
+
+                                if (eventData.done) {
+                                    eventSource.close();
+                                    button.disabled = false;
+                                    button.innerHTML = originalButtonText;
+                                    promptTextarea.value = ''; // Clear prompt on success
+
+                                    // Ensure final preview update
+                                    updatePreviewCallback();
+
+                                    // Show completion notification
+                                     showNotification('✧･ﾟ:* AI Generation Complete! *:･ﾟ✧', 'success');
+                                }
+                            } catch (parseError) {
+                                console.error("Error parsing stream data:", parseError, "Raw data:", event.data);
+                                // Handle potential non-JSON messages if necessary
+                            }
+                        };
+
+                        eventSource.onerror = function(error) {
+                            console.error("EventSource failed:", error);
+                            eventSource.close();
+                            button.disabled = false;
+                            button.innerHTML = originalButtonText;
+                            showNotification('Stream connection error (╥﹏╥)', 'error');
+                        };
+
+                    } else {
+                        // Handle cases where the initial request didn't return an ID
+                         throw new Error("Failed to get stream ID from server.");
+                    }
+
+                } catch (error) {
+                    console.error('Error during AI generation:', error);
+                    button.disabled = false;
+                    button.innerHTML = originalButtonText;
+                    // Use the specific error message if available
+                    showNotification(`Yabai! ${error.message || 'Something went wrong'} (╥﹏╥)`, 'error');
+                }
+            });
+        }
+
+        // Initialize AI Generation
+        initAiGeneration(markdownInput, updatePreview);
+
+    </script>
+</body>
+
+</html>
