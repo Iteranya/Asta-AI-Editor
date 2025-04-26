@@ -3,24 +3,24 @@ import json
 import uuid
 import re
 from fastapi import APIRouter, Form, Body, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from pathlib import Path
-from src.asta import generate_html_stream, active_generations, save_html, title_to_filename
+from src.asta import generate_html_stream, active_generations, title_to_filename, edit_with_ai
 
 router = APIRouter()
 
-@router.post("/save-doc")
-async def deploy_site(
-    content: str = Body(..., example="# Header"),
-    title: str = Body(..., example="my-document")
-):
-    try:
-        title = title_to_filename(title)
-        title = title+".md"
-        output_path = save_html(content, title)
-        return {"status": "success", "path": output_path}  # Return proper JSON!
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# @router.post("/save-doc")
+# async def deploy_site(
+#     content: str = Body(..., example="# Header"),
+#     title: str = Body(..., example="my-document")
+# ):
+#     try:
+#         title = title_to_filename(title)
+#         title = title+".md"
+#         output_path = save_html(content, title)
+#         return {"status": "success", "path": output_path}  # Return proper JSON!
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/doc-builder", response_class=HTMLResponse)
@@ -33,6 +33,15 @@ async def get_html():
         html = f.read()
 
     return html
+
+@router.post("/edit-text")
+async def edit_text(request: Request):
+    try:
+        task = await request.json()  # Get JSON body from the request
+        edited_content = await edit_with_ai(task)  # Call your AI edit function
+        return JSONResponse(content={"edited_content": edited_content})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 @router.post("/generate-doc")
 async def generate_doc(request: Request):

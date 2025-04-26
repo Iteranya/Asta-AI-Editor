@@ -1,5 +1,4 @@
 import config
-from src import llm
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -91,8 +90,6 @@ async def edit_with_ai(task):
     selected_text = str(task["selected_text"]) # Selected Text
 
     prompt = "<global_instruction>\n"+ global_instruction + "\n</global_instruction>\n\n<editor_content>"+editor_content + "\n</editor_content>\n\n<selected_text>\n"+selected_text+"\n</selected_text>\n\n<edit_instruction>"+edit_instruction+"</edit_instruction>"
-
-
 
     # print(f"Generating Doc~\n\n Prompt: {edit}")
     

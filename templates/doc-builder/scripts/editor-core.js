@@ -7,6 +7,7 @@ export class MarkdownEditor {
     constructor() {
         this.markdownInput = document.getElementById('markdown-input');
         this.markdownOutput = document.getElementById('markdown-output');
+        this.side_panel =  document.getElementById('sidebar-textarea');
         
         // Initialize with placeholder content
         this.markdownInput.value = initialMarkdown;
@@ -78,33 +79,71 @@ export class MarkdownEditor {
 
         // Handle apply button click
         const applyButton = document.getElementById('apply-rewrite');
-        applyButton.addEventListener('click', () => {
+
+        applyButton.addEventListener('click', async () => {
             const rewriteText = document.getElementById('rewrite-text').value;
             const selectedText = this.markdownInput.value.substring(
-            this.markdownInput.selectionStart, 
-            this.markdownInput.selectionEnd
+                this.markdownInput.selectionStart, 
+                this.markdownInput.selectionEnd
             );
             
             if (rewriteText && selectedText) {
-            // Here you would integrate with your AI rewrite functionality
-            // For now, we'll just create a placeholder that wraps the text with markers
-            const newText = `[REWRITE: ${rewriteText}] ${selectedText} [/REWRITE]`;
-            
-            const start = this.markdownInput.selectionStart;
-            const end = this.markdownInput.selectionEnd;
-            
-            // Replace the selected text
-            this.markdownInput.value = 
-                this.markdownInput.value.substring(0, start) + 
-                newText + 
-                this.markdownInput.value.substring(end);
-            
-            // Trigger input event to update preview
-            this.markdownInput.dispatchEvent(new Event('input'));
-            
-            // Close the modal
-            modal.style.display = 'none';
-            document.getElementById('rewrite-text').value = '';
+                const start = this.markdownInput.selectionStart;
+                const end = this.markdownInput.selectionEnd;
+                const editorContent = this.markdownInput.value;
+                const sidePanelValue = this.side_panel.value;
+                
+                // Create and show loading overlay
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = `<div class="loading-spinner"></div>`;
+                document.body.appendChild(loadingOverlay);
+
+                // Disable editor
+                this.markdownInput.disabled = true;
+                applyButton.disabled = true;
+                
+                try {
+                    const response = await fetch('/edit-text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            global_instruction: sidePanelValue,
+                            edit_instruction: rewriteText,
+                            editor_content: editorContent,
+                            selected_text: selectedText
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.edited_content) {
+                        const newText = data.edited_content;
+
+                        this.markdownInput.value = 
+                            this.markdownInput.value.substring(0, start) + 
+                            newText + 
+                            this.markdownInput.value.substring(end);
+
+                        this.markdownInput.dispatchEvent(new Event('input'));
+
+                        modal.style.display = 'none';
+                        document.getElementById('rewrite-text').value = '';
+                    } else {
+                        console.error('Error: No edited content returned.', data);
+                        alert('Failed to rewrite text.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Something went wrong while rewriting.');
+                } finally {
+                    // Re-enable editor and remove loading overlay
+                    this.markdownInput.disabled = false;
+                    applyButton.disabled = false;
+                    document.body.removeChild(loadingOverlay);
+                }
             }
         });
 
