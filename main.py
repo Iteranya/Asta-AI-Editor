@@ -11,7 +11,7 @@ app = FastAPI()
 
 # For static HTML tools
 app.mount("/builder", StaticFiles(directory="templates/doc-builder"), name = "doc-builder")
-
+app.mount("/latex", StaticFiles(directory="templates/latex-exporter"), name = "latex-exporter")
 # For templates
 templates = Jinja2Templates(directory="templates")
 

@@ -7,9 +7,9 @@ import shutil
 
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/latex", tags=["Latex"])
+router = APIRouter(tags=["Latex"])
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/latex-editor", response_class=HTMLResponse)
 async def get_html():
     template_path = "templates/latex-exporter/index.html"
     
