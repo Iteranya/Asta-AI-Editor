@@ -423,6 +423,7 @@
                     description: '',
                     ai_notes: '',
                     markdown: '',
+                    latex:'',
                     thumb: '',
                     metadata: '',
                     type: 'default' // Default type
@@ -467,6 +468,7 @@
                             description: '',
                             ai_notes: null, // Keep these as null/undefined for creation if optional
                             markdown: null,
+                            latex:null,
                             thumb: null,
                             metadata: null,
                             type: 'default' // Set default type
@@ -503,6 +505,7 @@
                          // Include other fields if they were editable, otherwise use existing values or defaults
                          ai_notes: this.isEditing ? this.currentProject.ai_notes : null,
                          markdown: this.isEditing ? this.currentProject.markdown : null,
+                         latex: this.isEditing ? this.currentProject.latex : null,
                          thumb: this.isEditing ? this.currentProject.thumb : null,
                          metadata: this.isEditing ? this.currentProject.metadata : null,
                     };

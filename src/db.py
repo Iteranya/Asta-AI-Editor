@@ -8,6 +8,7 @@ class Project:
     description: int|None = None
     ai_notes:str|None = None
     markdown:str|None = None
+    latex:str|None = None
     thumb:str|None = None
     metadata:str = "" # Stored Json from Metadata, contains json text with escaped string
     type:str = "default" # This is for Kali to process
@@ -26,6 +27,7 @@ class ProjectDB:
                 description INTEGER,
                 ai_notes TEXT,
                 markdown TEXT,
+                latex TEXT,
                 thumb TEXT,
                 metadata TEXT,
                 type TEXT DEFAULT 'default'
@@ -35,14 +37,14 @@ class ProjectDB:
 
     def create(self, project: Project):
         sql = '''
-            INSERT INTO project (title, slug, description, ai_notes, markdown, thumb, metadata, type)
+            INSERT INTO project (title, slug, description, ai_notes, markdown, latex, thumb, metadata, type)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         '''
-        self.conn.execute(sql, (project.title, project.slug, project.description, project.ai_notes, project.markdown, project.thumb, project.metadata, project.type))
+        self.conn.execute(sql, (project.title, project.slug, project.description, project.ai_notes, project.markdown, project.latex, project.thumb, project.metadata, project.type))
         self.conn.commit()
 
     def get_by_slug(self, slug: str) -> Project | None:
-        sql = 'SELECT title, slug, description, ai_notes, markdown, thumb, metadata, type FROM project WHERE slug = ?'
+        sql = 'SELECT title, slug, description, ai_notes, markdown, latex, thumb, metadata, type FROM project WHERE slug = ?'
         cur = self.conn.execute(sql, (slug,))
         row = cur.fetchone()
         if row:
@@ -62,7 +64,7 @@ class ProjectDB:
         self.conn.commit()
 
     def list_all(self) -> list[Project]:
-        sql = 'SELECT title, slug, description, ai_notes, markdown, thumb, metadata, type FROM project'
+        sql = 'SELECT title, slug, description, ai_notes, markdown, latex, thumb, metadata, type FROM project'
         cur = self.conn.execute(sql)
         return [Project(*row) for row in cur.fetchall()]
 

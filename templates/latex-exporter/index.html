@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaTeX Editor and Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --border-color: #bdc3c7;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .editor-pane {
+            border-right: 2px solid var(--border-color);
+            background-color: #fff;
+        }
+
+        .viewer-pane {
+            background-color: #f8f9fa;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: var(--primary-color);
+        }
+
+        #latex-editor {
+            flex-grow: 1;
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #latex-editor:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .viewer-pane {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #pdf-viewer-container {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 50px); /* Adjust based on h2 height */
+        }
+
+        #pdf-viewer {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%; /* Change from calc to use full container height */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #refresh-button {
+            background-color: white;
+            color: white;
+            border: none;
+            
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
+        }
+
+        #refresh-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        #refresh-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+        }
+
+        #refresh-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid var(--primary-color); /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message-area {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9em;
+            min-height: 40px; /* Reserve space for messages */
+        }
+
+        .message {
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .message.show {
+            opacity: 1;
+        }
+
+        .message.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .message.error {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .editor-pane {
+                border-right: none;
+                border-bottom: 2px solid var(--border-color);
+                height: 50vh; /* Adjust height for smaller screens */
+            }
+            .viewer-pane {
+                 height: 50vh; /* Adjust height for smaller screens */
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            #refresh-button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="pane editor-pane">
+            
+            <h2><i class="fas fa-file-code"></i> LaTeX Editor</h2>
+            <textarea id="latex-editor" spellcheck="false">\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+
+\title{My First LaTeX Document}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This is a sample LaTeX document created using the online editor.
+You can write your text here, including mathematical formulas like $E = mc^2$.
+
+\section{Mathematics}
+Here are some mathematical equations:
+\begin{align}
+    \sum_{i=1}^{n} i &= \frac{n(n+1)}{2} \\
+    \int_0^\infty e^{-x^2} dx &= \frac{\sqrt{\pi}}{2}
+\end{align}
+
+\section{Figure Example}
+% You can include images if they are accessible by the server
+% \begin{figure}[h!]
+%     \centering
+%     % \includegraphics[width=0.5\textwidth]{your_image.png}
+%     \caption{A sample figure caption.}
+%     \label{fig:sample}
+% \end{figure}
+
+\section{Conclusion}
+Happy LaTeXing!
+
+\end{document}
+            </textarea>
+        </div>
+
+        <div class="pane viewer-pane">
+            <h2>
+                <i class="fas fa-file-pdf"></i> 
+                PDF Viewer 
+                <button id="refresh-button">
+                <i class="fas fa-sync-alt"></i> 
+                </button>
+            </h2>
+             <div id="pdf-viewer-container" style="flex-grow: 1; position: relative;">
+                <iframe id="pdf-viewer" src="" title="PDF Viewer"></iframe>
+                <div id="viewer-placeholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #fff; border: 1px solid var(--border-color); border-radius: 8px;">
+                    <i class="fas fa-eye" style="font-size: 3em; color: var(--border-color); margin-bottom: 15px;"></i>
+                    <p style="color: var(--text-color); text-align: center;">Click the 'Refresh PDF' button below<br>to generate and view the PDF.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="message-area" id="message-area">
+        <!-- Messages will appear here -->
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        const latexEditor = document.getElementById('latex-editor');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const pdfViewerContainer = document.getElementById('pdf-viewer-container');
+        const viewerPlaceholder = document.getElementById('viewer-placeholder');
+        const refreshButton = document.getElementById('refresh-button');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const messageArea = document.getElementById('message-area');
+
+        // Hardcoded title for the PDF file
+        const pdfTitle = 'output.pdf';
+
+        // --- API Interaction ---
+        async function generatePdf() {
+            const latexContent = latexEditor.value;
+            if (!latexContent.trim()) {
+                displayMessage('LaTeX content cannot be empty.', 'error');
+                return;
+            }
+
+            showLoading(true);
+            refreshButton.disabled = true;
+            refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            clearMessage(); // Clear previous messages
+
+            try {
+                const apiUrl = '/latex/generate-pdf/'; // Assuming the API is served from the same origin
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        output_filename: pdfTitle,
+                        tex_content: latexContent
+                    })
+                });
+
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayMessage(result.message || 'PDF generated successfully!', 'success');
+                    const pdfPath = `/file/${pdfTitle}?t=${new Date().getTime()}`; 
+                    pdfViewer.src = pdfPath;
+                    viewerPlaceholder.style.display = 'none'; // Hide placeholder
+                    pdfViewer.style.display = 'block'; // Show iframe
+
+                } else {
+                    // Handle API errors (e.g., validation errors, server errors)
+                    console.error('API Error:', result);
+                    let errorMessage = 'Failed to generate PDF.';
+                    if (result.detail) {
+                        // FastAPI validation errors often come in `detail`
+                        if (Array.isArray(result.detail)) {
+                           errorMessage = result.detail.map(err => `${err.loc.join('.')} - ${err.msg}`).join('; ');
+                        } else if (typeof result.detail === 'string') {
+                            errorMessage = result.detail;
+                        }
+                    } else if (result.message) {
+                        errorMessage = result.message;
+                    }
+                    displayMessage(errorMessage, 'error');
+                     viewerPlaceholder.style.display = 'flex'; // Show placeholder again on error
+                     pdfViewer.style.display = 'none';
+                     pdfViewer.src = ''; // Clear src on error
+                }
+
+            } catch (error) {
+                console.error('Network or Frontend Error:', error);
+                displayMessage('An error occurred: ' + error.message, 'error');
+                 viewerPlaceholder.style.display = 'flex'; // Show placeholder again on error
+                 pdfViewer.style.display = 'none';
+                 pdfViewer.src = ''; // Clear src on error
+            } finally {
+                showLoading(false);
+                refreshButton.disabled = false;
+                refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh PDF';
+            }
+        }
+
+        // --- UI Interaction ---
+        refreshButton.addEventListener('click', generatePdf);
+
+        function showLoading(isLoading) {
+            if (isLoading) {
+                loadingOverlay.classList.add('active');
+            } else {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+         let messageTimeout;
+        function displayMessage(message, type = 'info') {
+             clearTimeout(messageTimeout); // Clear existing timeout if any
+             messageArea.innerHTML = ''; // Clear previous messages immediately
+
+            const messageElement = document.createElement('span');
+            messageElement.textContent = message;
+            messageElement.className = `message ${type}`;
+            messageArea.appendChild(messageElement);
+
+            // Trigger reflow to enable transition
+            void messageElement.offsetWidth;
+
+            messageElement.classList.add('show');
+
+            // Automatically hide the message after 5 seconds
+            messageTimeout = setTimeout(() => {
+                messageElement.classList.remove('show');
+                 // Remove the element after the transition ends
+                messageElement.addEventListener('transitionend', () => {
+                     if (messageArea.contains(messageElement)) {
+                        messageArea.removeChild(messageElement);
+                    }
+                }, { once: true });
+            }, 5000);
+        }
+
+         function clearMessage() {
+            clearTimeout(messageTimeout);
+            messageArea.innerHTML = '';
+        }
+
+        // Initial setup
+        pdfViewer.style.display = 'none'; // Hide iframe initially
+        viewerPlaceholder.style.display = 'flex'; // Show placeholder
+        messageArea.style.display = 'none'
+
+
+        // Add basic keyboard shortcut (Ctrl+S or Cmd+S) for refreshing
+        latexEditor.addEventListener('keydown', (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                event.preventDefault(); // Prevent browser's save action
+                refreshButton.click(); // Trigger the refresh action
+                displayMessage('Refreshing PDF (Ctrl+S)...', 'info');
+            }
+        });
+
+    </script>
+
+</body>
+</html>

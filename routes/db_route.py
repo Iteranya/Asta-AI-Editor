@@ -14,6 +14,7 @@ class ProjectCreate(BaseModel):
     description: Optional[str] = None
     ai_notes: Optional[str] = None
     markdown: Optional[str] = None
+    latex: Optional[str] = None
     thumb: Optional[str] = None
     metadata: Optional[str] = None
     type: str = "default"
