@@ -2,3 +2,5 @@ config.json
 .env
 /venv/
 /__pycache__/
+projects.db
+*.db

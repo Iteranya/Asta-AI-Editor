@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f4f7fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --success-color: #5cb85c;
+            --danger-color: #d9534f;
+            --warning-color: #f0ad4e;
+            --hover-color: #357ebd;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --input-bg: #fff;
+            --input-border: #ccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 i {
+            margin-right: 10px;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none; /* For link buttons */
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        .button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .button.success { background-color: var(--success-color); }
+        .button.success:hover { background-color: #4cae4c; }
+        .button.danger { background-color: var(--danger-color); }
+        .button.danger:hover { background-color: #c9302c; }
+        .button.warning { background-color: var(--warning-color); color: white; }
+        .button.warning:hover { background-color: #ec971f; }
+        .button.secondary { background-color: #6c757d; }
+        .button.secondary:hover { background-color: #5a6268; }
+
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px var(--shadow-color);
+        }
+
+        .project-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
+        .project-card p {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #555;
+            flex-grow: 1; /* Push actions to bottom */
+        }
+
+        .project-card .slug {
+            font-style: italic;
+            color: #777;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: auto; /* Pushes actions to the bottom */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: var(--input-bg);
+        }
+         .form-group input[type="text"]:read-only {
+            background-color: #eee;
+            cursor: not-allowed;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between; /* Align Asta button left, others right */
+            align-items: center; /* Vertically align items */
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .form-actions .right-buttons {
+             display: flex;
+             gap: 10px;
+        }
+
+
+        .loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+        .loading-indicator i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        [x-cloak] { display: none !important; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .project-grid {
+                grid-template-columns: 1fr; /* Stack cards on smaller screens */
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .modal-content {
+                width: 90%;
+            }
+            .form-actions {
+                 flex-direction: column;
+                 align-items: stretch; /* Make buttons full width */
+            }
+            .form-actions .right-buttons {
+                justify-content: flex-end; /* Keep Save/Cancel right aligned */
+                margin-top: 10px; /* Add space between Asta and others */
+            }
+             .form-actions > a, .form-actions > button {
+                width: 100%; /* Make buttons full width */
+                justify-content: center; /* Center text/icon */
+            }
+        }
+
+    </style>
+</head>
+
+<body x-data="projectAdmin()" x-init="fetchProjects()">
+
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-folder-open"></i> Project Admin Panel</h1>
+            <button @click="openModal()" class="button success">
+                <i class="fas fa-plus"></i> Create New Project
+            </button>
+        </header>
+
+        <div x-show="loading" class="loading-indicator" aria-live="polite">
+            <i class="fas fa-spinner"></i> Loading projects...
+        </div>
+
+        <div x-show="error" class="error-message" x-text="error" role="alert"></div>
+
+        <div x-show="!loading && !error" class="project-grid">
+            <template x-for="project in projects" :key="project.slug">
+                <div class="project-card">
+                    <h3><i class="fas fa-project-diagram"></i> <span x-text="project.title"></span></h3>
+                    <p class="slug">Slug: <span x-text="project.slug"></span></p>
+                    <p x-text="project.description ? project.description.substring(0, 100) + (project.description.length > 100 ? '...' : '') : 'No description available.'"></p>
+                    <div class="card-actions">
+                        <button @click="openModal(project)" class="button">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button @click="confirmDelete(project.slug)" class="button danger">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </template>
+             <div x-show="projects.length === 0 && !loading" class="project-card" style="text-align: center; grid-column: 1 / -1;">
+                 <p>No projects found. Create one to get started!</p>
+            </div>
+        </div>
+
+        <!-- Modal for Create/Edit Project -->
+        <div x-show="isModalOpen" class="modal active" x-cloak @keydown.escape.window="closeModal()" @click.self="closeModal()">
+            <div class="modal-content" @click.stop>
+                <div class="modal-header">
+                    <h2 x-text="isEditing ? 'Edit Project' : 'Create New Project'"></h2>
+                    <button @click="closeModal()" class="close-button" aria-label="Close modal">&times;</button>
+                </div>
+
+                 <div x-show="modalError" class="error-message" x-text="modalError" role="alert"></div>
+
+                <form @submit.prevent="saveProject()">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" x-model="currentProject.title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slug">Slug</label>
+                        <input type="text" id="slug" x-model="currentProject.slug" :readonly="isEditing" :disabled="isEditing" required :placeholder="isEditing ? '' : 'e.g., my-awesome-project'">
+                         <small x-show="!isEditing" style="color: #666; margin-top: 5px; display: block;">This will be used in the URL and cannot be changed later.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" x-model="currentProject.description"></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" x-model="currentProject.type" required>
+                            <option value="default">Default</option>
+                            <option value="research">Research</option>
+                            <option value="development">Development</option>
+                            <option value="design">Design</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                         <!-- Edit with Asta Button - only visible when editing and slug exists -->
+                        <a x-show="isEditing && currentProject.slug"
+                           :href="'/doc-builder?slug=' + currentProject.slug"
+                           target="_blank"
+                           class="button warning">
+                           <i class="fas fa-wand-magic-sparkles"></i> Edit With Asta
+                        </a>
+                         <!-- Placeholder for layout consistency when button isn't shown -->
+                         <div x-show="!isEditing || !currentProject.slug" style="visibility: hidden;">&nbsp;</div>
+
+
+                         <div class="right-buttons">
+                            <button type="button" @click="closeModal()" class="button secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="button success" :disabled="isSaving">
+                                <i :class="isSaving ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+                                <span x-text="isSaving ? 'Saving...' : 'Save Project'"></span>
+                            </button>
+                         </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for the API. Adjust if your FastAPI runs on a different port or path.
+        const API_BASE_URL = '/projects'; // Using relative path assumes FastAPI is serving this HTML
+
+        function projectAdmin() {
+            return {
+                projects: [],
+                loading: true,
+                error: null,
+                isModalOpen: false,
+                isEditing: false,
+                isSaving: false,
+                modalError: null,
+                currentProject: {
+                    title: '',
+                    slug: '',
+                    description: '',
+                    ai_notes: '',
+                    markdown: '',
+                    thumb: '',
+                    metadata: '',
+                    type: 'default' // Default type
+                },
+                originalSlug: '', // Store original slug for updates
+
+                async fetchProjects() {
+                    this.loading = true;
+                    this.error = null;
+                    try {
+                        const response = await fetch(API_BASE_URL);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        this.projects = await response.json();
+                    } catch (e) {
+                        console.error('Error fetching projects:', e);
+                        this.error = 'Failed to load projects. Please try refreshing the page.';
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                openModal(project = null) {
+                    this.modalError = null; // Clear previous modal errors
+                    this.isSaving = false; // Reset saving state
+                    if (project) {
+                        // Editing existing project
+                        this.isEditing = true;
+                        // Create a copy to avoid modifying the list directly
+                        this.currentProject = { ...project };
+                         // Ensure all potential fields exist, even if null/undefined from API
+                         this.currentProject.description = this.currentProject.description || '';
+                         this.currentProject.type = this.currentProject.type || 'default';
+                        this.originalSlug = project.slug; // Store original slug for PUT request
+                    } else {
+                        // Creating new project
+                        this.isEditing = false;
+                        this.currentProject = {
+                            title: '',
+                            slug: '',
+                            description: '',
+                            ai_notes: null, // Keep these as null/undefined for creation if optional
+                            markdown: null,
+                            thumb: null,
+                            metadata: null,
+                            type: 'default' // Set default type
+                        };
+                         this.originalSlug = '';
+                    }
+                    this.isModalOpen = true;
+                     // Focus the first input field when modal opens
+                    this.$nextTick(() => {
+                        const firstInput = document.getElementById('title');
+                        if(firstInput) firstInput.focus();
+                    });
+                },
+
+                closeModal() {
+                    this.isModalOpen = false;
+                    this.modalError = null; // Clear errors on close
+                },
+
+                async saveProject() {
+                    if (this.isSaving) return; // Prevent double submission
+                    this.isSaving = true;
+                    this.modalError = null;
+
+                    const url = this.isEditing ? `${API_BASE_URL}/${this.originalSlug}` : API_BASE_URL;
+                    const method = this.isEditing ? 'PUT' : 'POST';
+
+                    // Prepare payload - only include fields relevant to the form
+                    const payload = {
+                         title: this.currentProject.title,
+                         slug: this.currentProject.slug,
+                         description: this.currentProject.description || null, // Send null if empty
+                         type: this.currentProject.type,
+                         // Include other fields if they were editable, otherwise use existing values or defaults
+                         ai_notes: this.isEditing ? this.currentProject.ai_notes : null,
+                         markdown: this.isEditing ? this.currentProject.markdown : null,
+                         thumb: this.isEditing ? this.currentProject.thumb : null,
+                         metadata: this.isEditing ? this.currentProject.metadata : null,
+                    };
+
+                     // Basic client-side validation (slug format for new projects)
+                     if (!this.isEditing && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(this.currentProject.slug)) {
+                         this.modalError = 'Slug can only contain lowercase letters, numbers, and hyphens (e.g., my-project-slug).';
+                         this.isSaving = false;
+                         return;
+                     }
+
+
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                        }
+
+                        // Success
+                        this.closeModal();
+                        await this.fetchProjects(); // Refresh the list
+
+                    } catch (e) {
+                        console.error('Error saving project:', e);
+                         this.modalError = `Failed to save project: ${e.message}.`;
+                    } finally {
+                        this.isSaving = false;
+                    }
+                },
+
+                confirmDelete(slug) {
+                    if (confirm(`Are you sure you want to delete the project with slug "${slug}"? This action cannot be undone.`)) {
+                        this.deleteProject(slug);
+                    }
+                },
+
+                async deleteProject(slug) {
+                     this.error = null; // Clear general errors
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/${slug}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (!response.ok) {
+                             const errorData = await response.json();
+                            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                        }
+
+                        // Remove the project from the local list for immediate UI update
+                        this.projects = this.projects.filter(p => p.slug !== slug);
+                        // Optionally show a success message here if needed
+
+                    } catch (e) {
+                        console.error('Error deleting project:', e);
+                        this.error = `Failed to delete project: ${e.message}.`;
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
