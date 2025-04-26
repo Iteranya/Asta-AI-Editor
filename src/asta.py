@@ -6,42 +6,11 @@ import json
 import asyncio
 from openai import OpenAI
 import config
+import re
 
 
 # Create a thread pool for CPU-bound tasks
 executor = ThreadPoolExecutor()
-
-def save_html(html_content, file_name):
-    """Save HTML content to file - this can run in a separate thread"""
-    output_path = f"sites/drafts/{file_name}"
-    # Open file in text write mode (not binary)
-    with open(output_path, 'w', encoding='utf-8') as file:
-        file.write(html_content)
-    
-    print(f"HTML successfully saved to {output_path}")
-    return output_path
-
-def process_website_request(title, content):
-    """Process a website generation request - runs in a separate thread"""
-    # This is a blocking function that will be run in a thread pool
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    try:
-        # Generate the website synchronously since we're already in a separate thread
-        website_html = loop.run_until_complete(llm.generate_website({"title": title, "content": content}))
-        # Convert title to filename
-        filename = title_to_filename(title)
-        
-        # Save the HTML file
-        filename = title_to_filename(filename)
-        save_html(website_html, f"{filename}.html")
-        
-        print(f"Successfully processed website request: {title}")
-
-
-    finally:
-        loop.close()
 
 def title_to_filename(title):
     # Convert to lowercase
@@ -67,6 +36,7 @@ async def generate_html_stream(content, generation_id):
         api_key=config.get_key(),
     )
     try:
+        print(content)
         # Create the prompt
         messages = [
             {
@@ -105,3 +75,51 @@ async def generate_html_stream(content, generation_id):
     except Exception as e:
         print(f"Error in generation: {str(e)}")
         return f"<html><body><h1>Error</h1><p>{str(e)}</p></body></html>"
+    
+async def edit_with_ai(task):
+
+    ai_config:config.Config = config.load_or_create_config()
+
+    client = OpenAI(
+        base_url=ai_config.ai_endpoint,
+        api_key= config.get_key(),
+        )
+
+    global_instruction = str(task["global_instruction"]) # The Pane
+    edit_instruction = str(task["edit_instruction"]) # From Modal
+    editor_content = str(task["editor_content"]) # From Editor
+    selected_text = str(task["selected_text"]) # Selected Text
+
+    prompt = "<global_instruction>\n"+ global_instruction + "\n</global_instruction>\n\n<editor_content>"+editor_content + "\n</editor_content>\n\n<selected_text>\n"+selected_text+"\n</selected_text>\n\n<edit_instruction>"+edit_instruction+"</edit_instruction>"
+
+
+
+    # print(f"Generating Doc~\n\n Prompt: {edit}")
+    
+    completion = client.chat.completions.create(
+    model=ai_config.base_llm,
+    messages=[
+        {
+        "role": "system",
+        "content": f"{ai_config.system_note}\n\nFollow the instruction provided. You must edit the selected text as instruucted. Write it between <edited_content> </edited_content> tags. For example: <edited_content>\n# The Rewritten Passage \n\n In Markdown Format.\n</edited_content>"
+        },
+        {
+        "role": "user",
+        "content": prompt
+        },
+        {
+        "role": "assistant",
+        "content": "Understood, here's the rewritten content"
+        }
+    ]
+    )
+    result = completion.choices[0].message.content
+    result = regex_result(result)
+    return str(result)
+
+
+def regex_result(content: str):
+    match = re.search(r'<edited_content>(.*?)</edited_content>', content, re.DOTALL)
+    if match:
+        return match.group(1)
+    return None

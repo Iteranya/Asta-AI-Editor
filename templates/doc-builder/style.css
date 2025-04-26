@@ -1,0 +1,742 @@
+        /* Existing CSS from prompt */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --bg-primary: #1a1d24;
+            --bg-secondary: #282c34;
+            --bg-tertiary: #3a3f4b;
+            --text-primary: #abb2bf;
+            --text-secondary: #888c95;
+            --accent-primary: #61afef;
+            --accent-secondary: #c678dd;
+            --accent-success: #98c379;
+            --accent-error: #e06c75;
+            --border-color: #3e4451;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --scrollbar-thumb: #4b5263;
+            --scrollbar-thumb-hover: #61afef;
+            --font-primary: 'Poppins', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --sidebar-width: 300px; /* Define sidebar width */
+            --sidebar-width-collapsed: 60px; /* Define collapsed sidebar width */
+        }
+
+        ::selection {
+            background-color: var(--accent-primary);
+            color: var(--bg-secondary);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column; /* Changed to column */
+            justify-content: flex-start; /* Align items to the top */
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+            transition: padding-left 0.3s ease; /* Smooth transition for main content shift */
+        }
+
+        /* NEW: Added container for sidebar and main content */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* NEW: Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 0; /* Remove padding, handle internally */
+            box-shadow: 5px 0 15px var(--shadow-color);
+            position: fixed; /* Fixed position */
+            top: 0;
+            left: 0;
+            z-index: 100; /* Ensure sidebar is above other content */
+            transition: width 0.3s ease, transform 0.3s ease;
+            overflow: hidden; /* Prevent content overflow during transition */
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-width-collapsed);
+        }
+
+        .sidebar-content {
+            padding: 25px; /* Inner padding */
+            overflow-y: auto;
+            flex-grow: 1; /* Allow content to fill available space */
+            box-sizing: border-box;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-content {
+            opacity: 0;
+            pointer-events: none; /* Disable interaction when collapsed */
+        }
+
+        /* Scrollbar for sidebar */
+        .sidebar-content::-webkit-scrollbar {
+            width: 10px;
+        }
+        .sidebar-content::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 2px solid var(--bg-secondary);
+        }
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space between title and toggle */
+            padding: 18px 25px; /* Match pane-title padding */
+            background-color: rgba(40, 44, 52, 0.8); /* Semi-transparent */
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+            z-index: 1; /* Above sidebar content */
+            min-height: 64px; /* Ensure consistent height */
+            box-sizing: border-box;
+        }
+
+        .sidebar-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden; /* Hide title when collapsed */
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-title {
+             opacity: 0;
+        }
+
+        .sidebar-title i {
+            font-size: 1.1em;
+            color: var(--accent-secondary); /* Different accent for sidebar */
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.4em;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease, transform 0.3s ease;
+            position: absolute; /* Position relative to header */
+            right: 15px; /* Position on the right */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            /* Adjust position when collapsed */
+            right: 50%;
+            transform: translate(50%, -50%) rotate(180deg);
+        }
+
+
+        .sidebar-toggle:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Style for the text area inside the sidebar */
+        #sidebar-textarea {
+            width: 100%;
+            height: 200px; /* Example height, adjust as needed */
+            margin-top: 20px;
+            border: none;
+            padding: 15px; /* Consistent padding */
+            font-family: var(--font-code);
+            font-size: 14px; /* Slightly smaller font */
+            line-height: 1.6;
+            resize: vertical;
+            background-color: #21252b;
+            color: var(--text-primary);
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #sidebar-textarea:focus {
+            border-color: var(--accent-secondary); /* Sidebar accent color */
+            box-shadow: 0 0 0 4px rgba(198, 120, 221, 0.2);
+        }
+
+        #sidebar-textarea::placeholder {
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        /* Main Content Area - Adjust padding based on sidebar state */
+        .main-content {
+            flex-grow: 1; /* Takes remaining space */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-left: var(--sidebar-width); /* Initial padding to account for sidebar */
+            transition: padding-left 0.3s ease; /* Smooth transition */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width dynamically */
+            overflow: hidden; /* Prevent content overlap */
+        }
+
+        .main-content.sidebar-collapsed {
+            padding-left: var(--sidebar-width-collapsed);
+            width: calc(100% - var(--sidebar-width-collapsed));
+        }
+
+
+        .main-container {
+            display: flex;
+            width: 95%; /* Relative width within main-content */
+            max-width: 1800px; /* Increased max-width */
+            /* Adjusted height: use flex-grow for the container instead */
+            flex-grow: 1; /* Allow main-container to fill available height */
+            background-color: var(--bg-secondary);
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-top: 2vh; /* Added margin top */
+            margin-bottom: 20px; /* Add space before AI section */
+        }
+
+        .pane {
+            flex: 1;
+            padding: 35px; /* Increased padding */
+            overflow-y: auto;
+            box-sizing: border-box;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .pane::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .pane::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+
+        .pane::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+            border: 3px solid var(--bg-secondary); /* Creates padding around thumb */
+        }
+
+        .pane::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        .left-pane {
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .right-pane {
+            background-color: var(--bg-tertiary);
+        }
+
+        .pane-title {
+            position: sticky;
+            top: -35px; /* Adjust based on padding */
+            /* left: -35px; Removed, rely on padding */
+            padding: 18px 35px; /* Increased padding */
+            background-color: inherit;
+            border-bottom: 1px solid var(--border-color);
+            margin: -35px -35px 25px -35px; /* Adjusted margins */
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 12px; /* Increased gap */
+            backdrop-filter: blur(5px); /* Subtle blur effect */
+            background-color: rgba(40, 44, 52, 0.8); /* Semi-transparent background for sticky title */
+        }
+
+        .pane-title i {
+            font-size: 1.1em; /* Slightly larger icon */
+            color: var(--accent-primary);
+        }
+
+        textarea#markdown-input {
+            width: 100%;
+            /* Removed fixed height, let it fill space */
+            flex-grow: 1;
+            min-height: 300px; /* Minimum height */
+            border: none;
+            padding: 20px; /* Increased padding */
+            font-family: var(--font-code);
+            font-size: 15px; /* Increased font size */
+            line-height: 1.7; /* Increased line height */
+            resize: none;
+            background-color: #21252b; /* Slightly different dark shade */
+            color: var(--text-primary);
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            /* Allow textarea to take up remaining space */
+             height: calc(100% - 64px - 25px); /* Adjust based on pane-title height and margin */
+        }
+
+
+        textarea#markdown-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(97, 175, 239, 0.2); /* Adjusted focus shadow */
+        }
+
+        #markdown-output {
+            line-height: 1.8; /* Increased line height */
+            color: var(--text-primary);
+            word-wrap: break-word;
+        }
+
+        /* Enhanced Markdown specific styles */
+        #markdown-output h1, #markdown-output h2 {
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 0.4em;
+            margin-top: 1.8em;
+            margin-bottom: 1em;
+            color: var(--accent-secondary); /* Different color for top headers */
+        }
+         #markdown-output h3, #markdown-output h4, #markdown-output h5, #markdown-output h6 {
+            margin-top: 1.6em;
+            margin-bottom: 0.9em;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+            line-height: 1.4;
+        }
+        #markdown-output h1 { font-size: 2.2em; font-weight: 700; }
+        #markdown-output h2 { font-size: 1.9em; font-weight: 600; }
+        #markdown-output h3 { font-size: 1.6em; font-weight: 600; }
+        #markdown-output h4 { font-size: 1.3em; font-weight: 600; }
+        #markdown-output h5 { font-size: 1.15em; font-weight: 600; }
+        #markdown-output h6 { font-size: 1em; color: var(--text-secondary); font-weight: 600; }
+
+        #markdown-output p {
+            margin-bottom: 1.3em;
+        }
+
+        #markdown-output a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease, text-decoration 0.3s ease, background-color 0.3s ease;
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+        }
+        #markdown-output a:hover {
+            color: var(--bg-secondary);
+            background-color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        #markdown-output code:not(pre code) {
+            background-color: var(--bg-secondary);
+            padding: 0.3em 0.5em; /* Increased padding */
+            border-radius: 5px; /* Smoother radius */
+            font-family: var(--font-code);
+            font-size: 0.95em;
+            color: var(--accent-success); /* Greenish color for inline code */
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output pre {
+            background-color: #21252b; /* Consistent dark bg */
+            color: var(--text-primary);
+            padding: 1.2em; /* Increased padding */
+            border-radius: 10px; /* Smoother radius */
+            overflow-x: auto;
+            margin-bottom: 1.5em; /* Increased margin */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+            border: 1px solid var(--border-color);
+            position: relative; /* Needed for copy button */
+        }
+
+        /* NEW: Copy button for code blocks */
+        #markdown-output pre .copy-code-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            font-family: var(--font-primary);
+            cursor: pointer;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #markdown-output pre:hover .copy-code-button {
+            opacity: 1; /* Show on hover */
+        }
+
+        #markdown-output pre .copy-code-button:hover {
+            background-color: var(--accent-primary);
+            color: var(--bg-secondary);
+        }
+         #markdown-output pre .copy-code-button.copied {
+            background-color: var(--accent-success);
+            color: var(--bg-secondary);
+         }
+
+
+        #markdown-output pre code.hljs { /* Target hljs class specifically */
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-family: var(--font-code);
+            font-size: 0.95em; /* Slightly larger code font */
+            line-height: 1.6; /* Adjusted line height */
+            color: inherit;
+        }
+
+        #markdown-output blockquote {
+            border-left: 6px solid var(--accent-secondary); /* Thicker border with secondary accent */
+            padding: 15px 25px; /* Increased padding */
+            margin: 1.8em 0; /* Increased margin */
+            background-color: rgba(40, 44, 52, 0.5); /* Semi-transparent background */
+            color: var(--text-secondary);
+            font-style: normal; /* Removing italic for better readability */
+            border-radius: 0 8px 8px 0; /* Rounded corners */
+        }
+        #markdown-output blockquote p {
+            margin-bottom: 0.6em;
+        }
+        #markdown-output blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        #markdown-output ul, #markdown-output ol {
+            margin-left: 30px; /* Increased indent */
+            margin-bottom: 1.3em;
+            padding-left: 20px; /* Increased padding */
+        }
+        #markdown-output ul li, #markdown-output ol li {
+            margin-bottom: 0.7em; /* Increased spacing */
+        }
+        #markdown-output ul li::marker {
+             color: var(--accent-primary); /* Colored bullets */
+             font-size: 1.1em;
+        }
+         #markdown-output ol li::marker {
+             color: var(--accent-secondary); /* Colored numbers */
+             font-weight: 600;
+        }
+
+
+        #markdown-output table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for spacing and radius */
+            border-spacing: 0;
+            margin-bottom: 1.8em; /* Increased margin */
+            border: 1px solid var(--border-color);
+            border-radius: 8px; /* Rounded table corners */
+            overflow: hidden; /* Ensure radius is applied */
+        }
+        #markdown-output th, #markdown-output td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 15px; /* Increased padding */
+            text-align: left;
+        }
+        #markdown-output th {
+            background-color: var(--bg-tertiary); /* Darker header */
+            font-weight: 700; /* Bolder header */
+            color: var(--text-primary);
+            border-bottom-width: 2px; /* Thicker bottom border for headers */
+        }
+        #markdown-output tr:last-child td {
+             border-bottom: none; /* Remove border for last row */
+        }
+        #markdown-output tr:nth-child(even) td {
+            background-color: rgba(40, 44, 52, 0.3); /* Subtle striping */
+        }
+        #markdown-output tr:hover td {
+            background-color: rgba(97, 175, 239, 0.1); /* Hover effect */
+        }
+
+
+        #markdown-output img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px; /* Smoother radius */
+            margin: 1.2em 0; /* Increased margin */
+            box-shadow: 0 5px 15px var(--shadow-color); /* Subtle shadow */
+            display: block; /* Ensure block display for centering */
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output hr {
+            border: 0;
+            height: 2px; /* Thicker separator */
+            background-image: linear-gradient(to right, rgba(62, 68, 81, 0), var(--border-color), rgba(62, 68, 81, 0)); /* Fading gradient */
+            margin: 2.5em 0; /* Increased margin */
+        }
+
+        /* Placeholder text style */
+        #markdown-input::placeholder {
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        /* AI Generation Section */
+        .ai-section {
+            width: 95%; /* Relative width within main-content */
+            max-width: 1800px; /* Match main container */
+            margin-top: 0; /* Remove top margin, handled by main-content */
+            margin-bottom: 2vh; /* Add bottom margin */
+            padding: 25px;
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .ai-section form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ai-section textarea#ai-prompt {
+            width: 100%;
+            min-height: 60px; /* Adjusted height */
+            padding: 15px;
+            font-family: var(--font-primary);
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical; /* Allow vertical resize */
+            background-color: #21252b;
+            color: var(--text-primary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+         .ai-section textarea#ai-prompt:focus {
+            border-color: var(--accent-secondary); /* Different focus color */
+            box-shadow: 0 0 0 4px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section textarea#ai-prompt::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .ai-section button {
+            padding: 12px 25px;
+            font-family: var(--font-primary);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--bg-secondary);
+            background-color: var(--accent-secondary); /* Use secondary accent for button */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            align-self: flex-end; /* Align button to the right */
+            box-shadow: 0 4px 10px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section button:hover:not(:disabled) {
+            background-color: #d18ce0; /* Lighter shade on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(198, 120, 221, 0.3);
+        }
+
+        .ai-section button:active:not(:disabled) {
+            transform: translateY(0px);
+            box-shadow: 0 3px 8px rgba(198, 120, 221, 0.2);
+        }
+
+        .ai-section button:disabled {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .ai-section button .fa-spinner {
+            animation: fa-spin 1s linear infinite;
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* Completion Effect & Notifications */
+        .notification-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; /* Spacing between multiple notifications */
+        }
+
+        .notification {
+            /* Removed position fixed, now relative to container */
+            background-color: rgba(152, 195, 121, 0.95); /* Success color */
+            color: #1a1d24; /* Dark text for contrast */
+            padding: 12px 25px; /* Increased padding */
+            border-radius: 25px; /* More rounded */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px); /* Start slightly below */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease-out; /* Smooth bounce effect */
+            margin-top: auto; /* Push new notifications up */
+        }
+
+        .notification.error {
+             background-color: rgba(224, 108, 117, 0.95); /* Error color */
+             color: #ffffff; /* Light text */
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.hide {
+             transform: translateY(-10px) scale(0.95); /* Move up slightly and shrink */
+             opacity: 0;
+             transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+        }
+
+        .rewrite-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+          }
+          
+          .rewrite-modal-content {
+            position: absolute;
+            background-color: var(--bg-primary, #ffffff);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+          }
+          
+          .rewrite-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: var(--bg-secondary, #f5f5f5);
+            border-bottom: 1px solid var(--border-color, #e0e0e0);
+          }
+          
+          .rewrite-modal-header h4 {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-primary, #333);
+          }
+          
+          .close-modal {
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-secondary, #666);
+          }
+          
+          .close-modal:hover {
+            color: var(--text-primary, #333);
+          }
+          
+          .rewrite-modal-body {
+            padding: 15px;
+          }
+          
+          .rewrite-modal-body label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-secondary, #666);
+          }
+          
+          .rewrite-modal-body input {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color, #e0e0e0);
+            border-radius: 4px;
+            font-size: 14px;
+          }
+          
+          .rewrite-modal-body button {
+            padding: 6px 12px;
+            background-color: var(--accent-color, #4a6cf7);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+          }
+          
+          .rewrite-modal-body button:hover {
+            background-color: var(--accent-hover, #3a5ce7);
+          }
+          
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }

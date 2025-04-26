@@ -3,7 +3,7 @@ import re
 from openai import OpenAI
 
 
-async def generate_website(task):
+async def generate_doc(task):
 
     ai_config:config.Config = config.load_or_create_config()
 
@@ -13,7 +13,7 @@ async def generate_website(task):
         )
 
     content = task["content"]
-    print(f"Generating Website~\n\n Prompt: {content}")
+    print(f"Generating Doc~\n\n Prompt: {content}")
     
     completion = client.chat.completions.create(
     model=ai_config.base_llm,
@@ -34,3 +34,6 @@ async def generate_website(task):
     )
     result = completion.choices[0].message.content
     return result
+
+
+
