@@ -1,4 +1,4 @@
-**Asta AI Markdown Editor**
+# Asta AI Markdown Editor
 
 Welcome to Asta AI Markdown Editor, where coding meets cuteness! ✨ This isn’t just another boring Markdown editor—it’s your new best friend for organizing projects, writing docs, and sprinkling a little AI magic into your workflow. Built with love on **FastAPI**, **SQLite**, and pure **Vanilla JS/CSS/HTML**, Asta is here to make your life easier—and way more fun.
 
