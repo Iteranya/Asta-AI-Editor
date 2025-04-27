@@ -15,3 +15,6 @@
 . . .
 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+I can regex the markdown generated path to remove the preamble in the beginning
