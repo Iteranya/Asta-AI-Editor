@@ -25,34 +25,40 @@ async def get_html(request:Request):
 
     return html
 
-class LatexInput(BaseModel): # HERE
-    tex_content: str
-    output_filename: str
+class LatexInput(BaseModel):
+    directory: str  # relative to project root
+    latex_filename: str = "content.tex"
+    output_filename: str = "content.pdf"
 
-@router.post("/generate-pdf/") # FIX THIS NO TEMP, TEMP BAD
+@router.post("/generate-pdf/")
 async def generate_pdf(input: LatexInput):
-    # 1. Create a temp directory
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir_path = Path(tmpdir)
-        tex_file = tmpdir_path / "input.tex"
-        
-        # 2. Save the tex content
-        tex_file.write_text(input.tex_content, encoding="utf-8")
-        
-        # 3. Run tectonic
-        subprocess.run(
-            ["tectonic", str(tex_file), "-o", str(tmpdir_path), "-Z", "continue-on-errors"],
-            check=True
-        )
-        
-        # 4. Move the output pdf to the desired location
-        generated_pdf = tmpdir_path / "input.pdf"
-        final_path = Path("data/file") / input.output_filename
-        link = Path("file") / input.output_filename
-        shutil.move(str(generated_pdf), str(final_path))
-        
-    return {"message": "PDF generated successfully", "path": str(link)}
-
+    # Get project root and construct paths properly using Path objects
+    project_root = Path(__file__).parent.parent
+    print("The Project Root Is: " + str(project_root))
+    print("The Text Dir is: " + str(input.directory))
+    
+    # Handle the input directory by removing leading slash if present
+    clean_directory = input.directory.lstrip("/")
+    print("Clean directory: " + clean_directory)
+    
+    # Build proper path objects
+    tex_dir = project_root / clean_directory
+    print("Final tex_dir: " + str(tex_dir))
+    tex_dir.mkdir(parents=True, exist_ok=True)
+    tex_file = tex_dir / input.latex_filename
+    output_pdf = tex_dir / input.output_filename
+    
+    # Run tectonic from the tex directory
+    subprocess.run(
+        ["tectonic", str(tex_file), "-Z", "continue-on-errors"],
+        check=True,
+        cwd=str(tex_dir)
+    )
+    
+    return {
+        "message": "PDF generated successfully",
+        "path": f"{clean_directory}/{input.output_filename}"
+    }
 
 
 class MarkdownInput(BaseModel):
@@ -64,7 +70,7 @@ class MarkdownInput(BaseModel):
 async def generate_latex(input: MarkdownInput):
     converter = MarkdownToLatexConverter(
         markdown_content=input.markdown,
-        output_path="projects/"+input.output_path,
+        output_path=input.output_path,
         template=input.template
     )
     print("Output Path:", converter.output_path)

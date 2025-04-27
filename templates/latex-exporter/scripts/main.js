@@ -1,5 +1,5 @@
 // main.js - Main application module
-import { generatePdf, loadProject, generateLatex} from './api.js';
+import { generatePdf, loadProject, generateLatex, updateLatex} from './api.js';
 import { 
     showLoading, 
     displayMessage, 
@@ -40,17 +40,28 @@ export function initApp() {
         }
     }
 
-        // Generate PDF handler
-        function handleGeneratePdf() {
-            const latexContent = latexEditor.value;
+    async function handleGeneratePdf() {
+        const latexContent = latexEditor.value;
+        
+        try {
+            // Show loading state
+            updateRefreshButton(refreshButton, true);
+            showLoading(loadingOverlay, true);
+            clearMessage(messageArea);
             
-            generatePdf(latexContent, PDF_TITLE, {
-                onStart: () => {
-                    updateRefreshButton(refreshButton, true);
-                    showLoading(loadingOverlay, true);
-                    clearMessage(messageArea);
-                },
+            // First update the LaTeX content on the server
+            const updateResult = await updateLatex({ slug: slug.textContent }, latexContent);
+            
+            if (updateResult.status !== "success") {
+                throw new Error("Failed to update LaTeX content");
+            }
+            
+            // Then generate the PDF
+            await generatePdf(latexContent, PDF_TITLE, slug.textContent, {
+                onStart: () => {}, // Already showing loading state
                 onSuccess: (message, pdfPath) => {
+                    pdfPath = `/projects/${slug.textContent}/content.pdf`
+                    console.log(pdfPath)
                     displayMessage(messageArea, message, 'success');
                     updatePdfViewer(viewerPlaceholder, pdfViewer, pdfPath);
                 },
@@ -63,7 +74,13 @@ export function initApp() {
                     showLoading(loadingOverlay, false);
                 }
             });
+            
+        } catch (error) {
+            displayMessage(messageArea, `Error: ${error.message}`, 'error');
+            updateRefreshButton(refreshButton, false);
+            showLoading(loadingOverlay, false);
         }
+    }
 
     // Setup initial UI state
     setupInitialUI(pdfViewer, viewerPlaceholder, messageArea);

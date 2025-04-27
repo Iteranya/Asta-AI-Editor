@@ -156,32 +156,28 @@ class MarkdownToLatexConverter:
                 return f'\\subsubsection{{{title}}}'
         return title
 
-    def convert_images(self,content):
+    def convert_images(self, content):
         pattern = r'!\[(.*?)\]\(([^ \)]+)(?:\s+"(.*?)")?\)'
-
         # Use a replacement function for more control, especially for the label
         def replace_func(match):
             alt_text = match.group(1)
             image_path = match.group(2)
-            # Optional: title = match.group(3) # If you need the title for something else
-
+            image_name = os.path.basename(image_path)  # Get just the filename with extension
+            
             # Generate a cleaner label key from the image filename (without extension)
-            # Replace non-alphanumeric characters with underscores for safety
-            base_name = os.path.splitext(os.path.basename(image_path))[0]
+            base_name = os.path.splitext(image_name)[0]
             label_key = re.sub(r'[^a-zA-Z0-9]+', '_', base_name)
             if not label_key: # Handle cases where filename might be weird
                 label_key = "image"
-
             # Build the LaTeX string
             return (
                 f'\\begin{{figure}}[ht]\n'
                 f'  \\centering\n'
-                f'  \\includegraphics[width=0.8\\textwidth]{{{image_path}}}\n' # Use group 2 (path only)
-                f'  \\caption{{{alt_text}}}\n'                            # Use group 1 (alt text)
-                f'  \\label{{fig:{label_key}}}\n'                         # Use cleaned label key
+                f'  \\includegraphics[width=0.8\\textwidth]{{{image_name}}}\n'  # Use just the filename
+                f'  \\caption{{{alt_text}}}\n'                    # Use group 1 (alt text)
+                f'  \\label{{fig:{label_key}}}\n'                 # Use cleaned label key
                 f'\\end{{figure}}\n' # Added newline for better spacing in output
             )
-
         return re.sub(pattern, replace_func, content)
 
     def convert_tables(self, content):
