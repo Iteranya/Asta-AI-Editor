@@ -1,0 +1,7 @@
+{
+    "system_note": "ONLY WRITE IN MARKDOWN FORMAT.",
+    "ai_endpoint": "https://llm.chutes.ai/v1",
+    "base_llm": "deepseek-ai/DeepSeek-V3-0324",
+    "temperature": 0.5,
+    "ai_key": ""
+  }

@@ -376,11 +376,19 @@
 
                     <div class="form-actions">
                          <!-- Edit with Asta Button - only visible when editing and slug exists -->
+                         <a x-show="isEditing && currentProject.slug"
+                            :href="'/doc-builder?slug=' + currentProject.slug"
+                            target="_blank"
+                            class="button warning"
+                            @click="closeModal()">
+                            <i class="fas fa-wand-magic-sparkles"></i> Edit With Asta
+                        </a>
                         <a x-show="isEditing && currentProject.slug"
-                           :href="'/doc-builder?slug=' + currentProject.slug"
-                           target="_blank"
-                           class="button warning">
-                           <i class="fas fa-wand-magic-sparkles"></i> Edit With Asta
+                            :href="'/latex-editor?slug=' + currentProject.slug"
+                            target="_blank"
+                            class="button warning"
+                            @click="closeModal()">
+                            <i class="fas fa-wand-magic-sparkles"></i> Export With Ender
                         </a>
                          <!-- Placeholder for layout consistency when button isn't shown -->
                          <div x-show="!isEditing || !currentProject.slug" style="visibility: hidden;">&nbsp;</div>

@@ -25,11 +25,11 @@ async def get_html(request:Request):
 
     return html
 
-class LatexInput(BaseModel):
+class LatexInput(BaseModel): # HERE
     tex_content: str
     output_filename: str
 
-@router.post("/generate-pdf/")
+@router.post("/generate-pdf/") # FIX THIS NO TEMP, TEMP BAD
 async def generate_pdf(input: LatexInput):
     # 1. Create a temp directory
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -64,13 +64,22 @@ class MarkdownInput(BaseModel):
 async def generate_latex(input: MarkdownInput):
     converter = MarkdownToLatexConverter(
         markdown_content=input.markdown,
-        output_path=input.output_path,
+        output_path="projects/"+input.output_path,
         template=input.template
     )
+    print("Output Path:", converter.output_path)
+    
+    # Create directories if they don't exist
+   
+    os.makedirs(os.path.dirname(converter.output_path), exist_ok=True)
+    
     converter.generate_latex()
-
-    # After writing to file, also return the LaTeX string (optional)
-    with open(input.output_path, 'r', encoding='utf-8') as f:
-        latex_content = f.read()
-
-    return {"message": "Latex generated successfully", "latex": latex_content}
+    
+    # After writing to file, also return the LaTeX string
+    try:
+        with open(converter.output_path, 'r', encoding='utf-8') as f:
+            latex_content = f.read()
+    except FileNotFoundError:
+        return {"message": "Error: Output file not found", "latex": ""}
+        
+    return {"message": "LaTeX generated successfully", "latex": latex_content}

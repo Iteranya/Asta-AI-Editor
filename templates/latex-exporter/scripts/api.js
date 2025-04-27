@@ -50,7 +50,7 @@ export async function generatePdf(latexContent, pdfTitle, callbacks) {
 
 export async function loadProject(slug) {
     try {
-        const response = await fetch(`/projects/${slug}`);
+        const response = await fetch(`/db/${slug}`);
         if (!response.ok) {
             throw new Error(`Error fetching project: ${response.statusText}`);
         }
@@ -66,7 +66,7 @@ export async function generateLatex(project) {
     console.log(project)
     const markdown_content = project.markdown;
     const template = project.type || "default.tex"; // fallback to default if not provided
-    const output = "output.tex";
+    const output = project.slug+"/output.tex";
 
     try {
         const response = await fetch('/generate-latex/', {

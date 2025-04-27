@@ -12,7 +12,7 @@ class MarkdownToLatexConverter:
             template_path (str, optional): Path to a single .tex template file
         """
         self.markdown_content = markdown_content
-        self.output_path = output_path
+        self.output_path = 'projects/'+output_path
         self.template_path = "latex/"+template
         self.current_appendix = False
 

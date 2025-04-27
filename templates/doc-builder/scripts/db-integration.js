@@ -88,7 +88,8 @@ export async function updateProject(slug, projectData) {
   const project = await response.json();
 
   // 2. Upload the content.md file
-  const content = projectData.content || "";
+  const content = projectData.markdown || "";
+  console.log("Content of ProjectData Is: "+content)
   const file = new File([content], "content.md", { type: "text/markdown" });
   
   const formData = new FormData();
