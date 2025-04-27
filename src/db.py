@@ -11,7 +11,7 @@ class Project:
     latex:str|None = None
     thumb:str|None = None
     metadata:str = "" # Stored Json from Metadata, contains json text with escaped string
-    type:str = "default" # This is for Kali to process
+    type:str = "default.tex" # This is for Kali to process
 
 class ProjectDB:
     def __init__(self, db_name="projects.db"):
@@ -38,7 +38,7 @@ class ProjectDB:
     def create(self, project: Project):
         sql = '''
             INSERT INTO project (title, slug, description, ai_notes, markdown, latex, thumb, metadata, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
         '''
         self.conn.execute(sql, (project.title, project.slug, project.description, project.ai_notes, project.markdown, project.latex, project.thumb, project.metadata, project.type))
         self.conn.commit()

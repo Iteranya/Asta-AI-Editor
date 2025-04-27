@@ -1,0 +1,169 @@
+\documentclass[12pt, a4paper, onecolumn, oneside]{report}
+\usepackage[bahasa]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{tocloft}
+\usepackage{titletoc} % Add this package for more TOC customization
+\usepackage{mathptmx} % Times New Roman font
+
+% Margin settings
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=2.5cm
+}
+
+% Chapter numbering in Roman numerals
+\renewcommand{\thechapter}{\Roman{chapter}}
+
+% Section and subsection numbering in Arabic numerals
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+% Chapter title format
+\titleformat{\chapter}[display]
+{\normalfont\bfseries\centering\fontsize{14}{16.8}\selectfont}
+{\chaptertitlename\ \thechapter}{14pt}{\fontsize{14}{16.8}\selectfont}
+
+% Adjust chapter spacing to remove extra vertical space
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+% Section title format
+\titleformat{\section}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesection}{1em}{}
+
+% Subsection title format
+\titleformat{\subsection}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesubsection}{1em}{}
+
+% Line spacing 1.15
+\setstretch{1.15}
+
+% Table of Contents, List of Figures, and List of Tables formatting
+\usepackage{etoolbox}
+\renewcommand{\cfttoctitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfil\par}
+\renewcommand{\cftloftitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftafterloftitle}{\hfil\par}
+\renewcommand{\cftlottitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftafterlottitle}{\hfil\par}
+
+% Dotted leaders settings
+\makeatletter
+\renewcommand{\@dotsep}{2}
+\makeatother
+
+% Customize TOC entries with dotted leaders
+\titlecontents{chapter}[0pt]
+{\addvspace{0pt}\bfseries}
+{\contentslabel{0pt}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{section}[1em]
+{\addvspace{0pt}}
+{\contentslabel{1em}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{subsection}[2em]
+{\addvspace{0pt}}
+{\contentslabel{2em}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\begin{document}
+\chapter{Asta AI Markdown Editor}
+
+Welcome to Asta AI Markdown Editor, where coding meets cuteness! ✨ This isn’t just another boring Markdown editor—it’s your new best friend for organizing projects, writing docs, and sprinkling a little AI magic into your workflow. Built with love on \textbf{FastAPI}, \textbf{SQLite}, and pure \textbf{Vanilla JS/CSS/HTML}, Asta is here to make your life easier—and way more fun.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{https://media.discordapp.net/attachments/1112015127873597452/1365732631005761578/image.png?ex=680e6121&is=680d0fa1&hm=586f78df3971cf560e94e108b909d396e94257b0f33d2c7db9704b8fdb9b0c95&=&format=webp&quality=lossless&width=1694&height=800}
+  \caption{Asta}
+  \label{fig:image}
+\end{figure}
+
+
+---
+
+\subsection{🎉 What’s Inside the Magic Box?}
+
+\textbf{Split View Magic}
+Write your raw Markdown on the left, and watch it come to life on the right! It’s like having a tiny wizard in your browser, casting spells to turn your words into beautiful docs.
+
+\textbf{AI Brainstorm Buddy}
+Stuck? Let the AI take over! The bottom AI pane will continue your thoughts without messing up your work. It’s like having a coding buddy who’s always ready to help—but without the coffee breath.
+
+\textbf{Rewrite Wizardry}
+Highlight some text, right-click, and boom! The AI will polish your words like a pro. Perfect for when you want to sound smart without actually trying.
+
+\textbf{Notes for Nerds}
+Got extra context or random thoughts? Throw them into the Notes panel, and the AI will use them to make your writing even better. It’s like giving your AI a cheat sheet!
+
+\textbf{Workspace Wonderland}
+Create new projects with a single click. No project? No problem! You can still work, but saving is disabled—so don’t forget to create one before you get too deep into your genius ideas.
+
+\textbf{Image Paste Party}
+Copy-paste images directly into the editor, and they’ll be saved in your project directory. It’s like magic, but with fewer rabbits and more Markdown.
+
+\textbf{Save & Autosave}
+Your work is safe with Asta. Save manually or let autosave do its thing—either way, your genius won’t be lost.
+
+---
+
+\subsection{🛠️ How to Get Started}
+
+\begin{enumerate}
+\item \textbf{Clone the Repo}
+   \begin{verbatim}
+git clone \url{https://github.com/Iteranya/Asta-AI-Editor.git}
+   cd Asta-AI-Editor
+\end{verbatim}
+\end{enumerate}
+
+\begin{enumerate}
+\item \textbf{Install the Goodies}
+   \begin{verbatim}
+pip install -r requirements.txt
+\end{verbatim}
+\end{enumerate}
+
+\begin{enumerate}
+\item \textbf{Run the Server}
+   \begin{verbatim}
+uvicorn main:app --reload
+\end{verbatim}
+\end{enumerate}
+
+\begin{enumerate}
+\item \textbf{Open Your Browser}
+\end{enumerate}
+   Head to \texttt{\url{http://localhost:5452}} and let the fun begin!
+
+---
+
+\subsection{🧙‍♂️ Tech Stack}
+
+\begin{itemize}
+\item \textbf{Backend}: FastAPI, SQLite, OpenAI API
+\item \textbf{Frontend}: Vanilla JavaScript, HTML, CSS
+\end{itemize}
+
+---
+
+\subsection{📄 License}
+
+GPL-3 License. Use it, tweak it, build on it—just don’t gatekeep it!
+
+\end{document}

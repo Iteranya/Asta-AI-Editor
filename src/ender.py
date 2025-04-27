@@ -2,7 +2,7 @@ import re
 import os
 
 class MarkdownToLatexConverter:
-    def __init__(self, markdown_content, output_path, template_path=None):
+    def __init__(self, markdown_content, output_path, template="default.tex"):
         """
         Initialize the converter with markdown content as string.
         
@@ -13,14 +13,11 @@ class MarkdownToLatexConverter:
         """
         self.markdown_content = markdown_content
         self.output_path = output_path
-        self.template_path = template_path
+        self.template_path = "latex/"+template
         self.current_appendix = False
 
     def load_template(self):
-        """Load the LaTeX template if provided."""
-        if not self.template_path:
-            return ""
-            
+       
         try:
             with open(self.template_path, "r", encoding="utf-8") as template_file:
                 return template_file.read()

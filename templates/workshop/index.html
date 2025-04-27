@@ -370,10 +370,7 @@
                      <div class="form-group">
                         <label for="type">Type</label>
                         <select id="type" x-model="currentProject.type" required>
-                            <option value="default">Default</option>
-                            <option value="research">Research</option>
-                            <option value="development">Development</option>
-                            <option value="design">Design</option>
+                            <option value="default">default.tex</option>
                         </select>
                     </div>
 
@@ -426,7 +423,7 @@
                     latex:'',
                     thumb: '',
                     metadata: '',
-                    type: 'default' // Default type
+                    type: 'default.tex' // Default type
                 },
                 originalSlug: '', // Store original slug for updates
 
@@ -471,7 +468,7 @@
                             latex:null,
                             thumb: null,
                             metadata: null,
-                            type: 'default' // Set default type
+                            type: 'default.tex' // Set default type
                         };
                          this.originalSlug = '';
                     }
@@ -502,12 +499,12 @@
                          slug: this.currentProject.slug,
                          description: this.currentProject.description || null, // Send null if empty
                          type: this.currentProject.type,
-                         // Include other fields if they were editable, otherwise use existing values or defaults
-                         ai_notes: this.isEditing ? this.currentProject.ai_notes : null,
-                         markdown: this.isEditing ? this.currentProject.markdown : null,
-                         latex: this.isEditing ? this.currentProject.latex : null,
-                         thumb: this.isEditing ? this.currentProject.thumb : null,
-                         metadata: this.isEditing ? this.currentProject.metadata : null,
+
+                         ai_notes:this.currentProject.ai_notes,
+                         markdown:this.currentProject.markdown,
+                         latex: this.currentProject.latex,
+                         thumb: this.currentProject.thumb,
+                         metadata: this.currentProject.metadata
                     };
 
                      // Basic client-side validation (slug format for new projects)

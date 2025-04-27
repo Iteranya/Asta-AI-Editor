@@ -11,6 +11,7 @@ db = ProjectDB()
 # Pydantic model for request/response
 class ProjectCreate(BaseModel):
     title: str
+    slug: str
     description: Optional[str] = None
     ai_notes: Optional[str] = None
     markdown: Optional[str] = None
@@ -20,6 +21,21 @@ class ProjectCreate(BaseModel):
     type: str = "default"
 
 class ProjectOut(ProjectCreate):
+    pass
+
+# Pydantic model for request/response
+class ProjectUpdate(BaseModel):
+    title: str
+    slug: str
+    description: Optional[str] = None
+    ai_notes: Optional[str] = None
+    markdown: Optional[str] = None
+    latex: Optional[str] = None
+    thumb: Optional[str] = None
+    metadata: Optional[str] = None
+    type: str = "default"
+
+class ProjectOutUpdate(ProjectUpdate):
     pass
 
 @router.post("/", response_model=ProjectOut)
@@ -45,7 +61,9 @@ def update_project(slug: str, project: ProjectCreate, db: ProjectDB = Depends(ge
     existing = db.get_by_slug(slug)
     if not existing:
         raise HTTPException(status_code=404, detail="Project not found.")
-    db.update(slug, **project.dict())
+    update_data = project.dict()
+    update_data.pop("slug", None)  # <- remove the second 'slug'
+    db.update(slug, **update_data)
     updated = db.get_by_slug(slug)
     return updated
 

@@ -1,0 +1,85 @@
+\documentclass[12pt, a4paper, onecolumn, oneside]{report}
+\usepackage[bahasa]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{tocloft}
+\usepackage{titletoc} % Add this package for more TOC customization
+\usepackage{mathptmx} % Times New Roman font
+
+% Margin settings
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=2.5cm
+}
+
+% Chapter numbering in Roman numerals
+\renewcommand{\thechapter}{\Roman{chapter}}
+
+% Section and subsection numbering in Arabic numerals
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+% Chapter title format
+\titleformat{\chapter}[display]
+{\normalfont\bfseries\centering\fontsize{14}{16.8}\selectfont}
+{\chaptertitlename\ \thechapter}{14pt}{\fontsize{14}{16.8}\selectfont}
+
+% Adjust chapter spacing to remove extra vertical space
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+% Section title format
+\titleformat{\section}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesection}{1em}{}
+
+% Subsection title format
+\titleformat{\subsection}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesubsection}{1em}{}
+
+% Line spacing 1.15
+\setstretch{1.15}
+
+% Table of Contents, List of Figures, and List of Tables formatting
+\usepackage{etoolbox}
+\renewcommand{\cfttoctitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfil\par}
+\renewcommand{\cftloftitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftafterloftitle}{\hfil\par}
+\renewcommand{\cftlottitlefont}{\hfil\Large\bfseries}
+\renewcommand{\cftafterlottitle}{\hfil\par}
+
+% Dotted leaders settings
+\makeatletter
+\renewcommand{\@dotsep}{2}
+\makeatother
+
+% Customize TOC entries with dotted leaders
+\titlecontents{chapter}[0pt]
+{\addvspace{0pt}\bfseries}
+{\contentslabel{0pt}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{section}[1em]
+{\addvspace{0pt}}
+{\contentslabel{1em}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\titlecontents{subsection}[2em]
+{\addvspace{0pt}}
+{\contentslabel{2em}}
+{\hspace*{0pt}}
+{\titlerule*[0.5pc]{.}\contentspage}
+
+\begin{document}
