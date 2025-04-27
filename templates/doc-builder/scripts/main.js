@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const side_panel =  document.getElementById('sidebar-textarea');
     const slug = document.getElementById('slug-container').textContent;
-    console.log(slug)
     setupImagePasteHandler();
 
     const actionButton = document.getElementById('action-button');
@@ -30,8 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
             actionButton.addEventListener('click', function() {
                 getProject(slug)
                     .then(project_data => {
-                        console.log(side_panel.value);
-                        console.log(inputElement.value);
                         project_data.ai_notes = side_panel.value;
                         project_data.markdown = inputElement.value;
                         updateProject(slug, project_data)

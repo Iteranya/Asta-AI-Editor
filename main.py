@@ -9,14 +9,12 @@ from routes import asta_routes,config_routes,media_route,amiya_routes,db_route,e
 
 app = FastAPI()
 
-# For static HTML tools
-# OOOOOHHH!!!! So THAT'S why people put things in static and separate template with static...
-
-# ...
-
 # I'm already this far, I'll let next project deal with this.
 app.mount("/builder", StaticFiles(directory="templates/doc-builder"), name = "doc-builder")
 app.mount("/latex", StaticFiles(directory="templates/latex-exporter"), name = "latex-exporter")
+# Please, please, please, please work...
+app.mount("/projects",StaticFiles(directory="projects"),name = "project-directories")
+
 # For templates
 templates = Jinja2Templates(directory="templates")
 

@@ -1,4 +1,4 @@
-const API_BASE_URL = '/projects';
+const API_BASE_URL = '/db';
 
 /**
  * Fetch all projects
@@ -69,6 +69,7 @@ export async function createProject(projectData) {
  * @returns {Promise<Object>} Updated project data
  */
 export async function updateProject(slug, projectData) {
+  // 1. Update the project (normal PUT)
   const response = await fetch(`${API_BASE_URL}/${slug}`, {
     method: 'PUT',
     headers: {
@@ -76,15 +77,35 @@ export async function updateProject(slug, projectData) {
     },
     body: JSON.stringify(projectData),
   });
-  
+
   if (!response.ok) {
     if (response.status === 404) {
       throw new Error(`Project "${slug}" not found`);
     }
     throw new Error(`Failed to update project: ${response.statusText}`);
   }
+
+  const project = await response.json();
+
+  // 2. Upload the content.md file
+  const content = projectData.content || "";
+  const file = new File([content], "content.md", { type: "text/markdown" });
   
-  return response.json();
+  const formData = new FormData();
+  formData.append("file", file, `${slug}/content.md`);
+
+  const uploadResponse = await fetch(`files`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error(`Failed to upload content.md: ${uploadResponse.statusText}`);
+  }
+
+  const uploadResult = await uploadResponse.json();
+
+  return { project, uploadResult };
 }
 
 /**

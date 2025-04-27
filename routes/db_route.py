@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from src.db import ProjectDB, Project,get_db  # Assume you saved the previous db code in project_db.py
 from fastapi import Depends
-router = APIRouter(prefix="/projects", tags=["Projects"])
+router = APIRouter(prefix="/db", tags=["Projects"])
 
 # Initialize database
 db = ProjectDB()
