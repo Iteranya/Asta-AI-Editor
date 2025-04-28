@@ -2,7 +2,8 @@
 
 Welcome to Asta AI Markdown Editor, where coding meets cuteness! ✨ This isn't just another boring Markdown editor—it's your new best friend for organizing projects, writing docs, and sprinkling a little AI magic into your workflow. Built with love on **FastAPI**, **SQLite**, and pure **Vanilla JS/CSS/HTML**, Asta is here to make your life easier—and way more fun.
 
-![Asta](https://media.discordapp.net/attachments/1112015127873597452/1365732631005761578/image.png?ex=680e6121&is=680d0fa1&hm=586f78df3971cf560e94e108b909d396e94257b0f33d2c7db9704b8fdb9b0c95&=&format=webp&quality=lossless&width=1694&height=800)
+![image](https://github.com/user-attachments/assets/d204bd8e-abe3-44e5-935d-104322f28fb9)
+
 
 ---
 
