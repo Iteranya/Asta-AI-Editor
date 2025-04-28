@@ -15,7 +15,7 @@ Write your raw Markdown on the left, and watch it come to life on the right! It'
 ### 🤖 AI Integration
 
 **AI Brainstorm Buddy**
-Stuck? Let the AI take over! The bottom AI pane will continue your thoughts without messing up your work. It's like having a coding buddy who's always ready to help—but without the coffee breath. Just type "//" to summon your AI assistant and watch it complete your thoughts.
+Stuck? Let the AI take over! The bottom AI pane will continue your thoughts without messing up your work. It's like having a coding buddy who's always ready to help—but without the coffee breath. Just type in the text box below the editor and write down what you want the AI to write.
 
 **Rewrite Wizardry**
 Highlight some text, right-click, and boom! The AI will polish your words like a pro. Perfect for when you want to sound smart without actually trying. Just right click and type down what you want AI to do with that passage.
