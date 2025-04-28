@@ -50,22 +50,6 @@ Asta automatically organizes your files, handling relationships between markdown
 **Image Paste Party**
 Copy-paste images directly into the editor, and they'll be saved in your project directory. It's like magic, but with fewer rabbits and more Markdown. Support for screenshots, web images, and local files means no more awkward image management workflows.
 
-**Automatic Image Optimization**
-Large images are automatically optimized for web viewing in the preview pane while preserving the original for export purposes. This ensures fast loading times without sacrificing quality in your final output.
-
-### 💾 Data Protection
-
-**Save & Autosave**
-Your work is safe with Asta. Save manually or let autosave do its thing—either way, your genius won't be lost. Configure autosave intervals to match your working style—from "paranoid" (every minute) to "confident" (every 10 minutes).
-
-**Local-First Philosophy**
-All your data stays on your machine. No cloud dependencies or internet requirements mean you can work offline and maintain complete control over your intellectual property.
-
-**Export Options**
-Besides LaTeX, export your work as PDF, HTML, or plain Markdown with a single click. Perfect for sharing with colleagues who haven't yet discovered the joy of Asta.
-
----
-
 ## 🛠️ How to Get Started
 
 1. **Clone the Repo**
