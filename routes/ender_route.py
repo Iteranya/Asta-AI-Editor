@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Form, Body, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from pathlib import Path
 import tempfile
 import subprocess
 import shutil
 import os
 from pydantic import BaseModel
-from src.ender import MarkdownToLatexConverter
+from src.ender import MarkdownToLatexConverter, zip_latex
+
 
 router = APIRouter(tags=["Latex"])
 
@@ -89,3 +90,25 @@ async def generate_latex(input: MarkdownInput):
         return {"message": "Error: Output file not found", "latex": ""}
         
     return {"message": "LaTeX generated successfully", "latex": latex_content}
+
+@router.get("/generate_project_zip/{slug}")  
+async def generate_project_zip(slug: str):
+    try:
+        zip_path = zip_latex(slug)
+        
+        # Check if zip file was created successfully
+        if not os.path.exists(zip_path):
+            raise HTTPException(status_code=500, detail="Failed to create zip file")
+            
+        # Return the file as a downloadable response
+        return FileResponse(
+            zip_path,
+            media_type='application/zip',
+            filename=f"{slug}.zip"
+        )
+        
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating zip: {str(e)}")
+    

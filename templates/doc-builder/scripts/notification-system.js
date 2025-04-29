@@ -8,22 +8,28 @@ export class NotificationSystem {
      * @param {'success' | 'error'} type - The type of notification.
      */
     static show(message, type = 'success') {
+        // Always get or create the container
+        let container = document.getElementById('notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'notification-container';
+            container.className = 'notification-container';
+            document.body.appendChild(container);
+        }
+    
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        notification.innerHTML = message; // Use innerHTML to allow basic formatting like icons
-        document.body.appendChild(notification);
+        notification.innerHTML = message;
+        container.appendChild(notification);
         
-        // Trigger animation
         requestAnimationFrame(() => {
             notification.classList.add('show');
         });
         
-        // Auto-hide after a delay
         setTimeout(() => {
             notification.classList.remove('show');
             notification.classList.add('hide');
-            // Remove from DOM after fade out animation
             setTimeout(() => notification.remove(), 300);
-        }, 3000); // Show for 3 seconds
+        }, 3000);
     }
 }

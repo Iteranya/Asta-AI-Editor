@@ -306,7 +306,7 @@
     </style>
 </head>
 
-<body x-data="projectAdmin()" x-init="fetchProjects()">
+<body x-data="projectAdmin()" x-init="fetchProjects(); fetchTemplates()">
 
     <div class="container">
         <header class="header">
@@ -367,10 +367,12 @@
                         <label for="description">Description</label>
                         <textarea id="description" x-model="currentProject.description"></textarea>
                     </div>
-                     <div class="form-group">
-                        <label for="type">Type</label>
+                    <div class="form-group">
+                        <label for="type">Template</label>
                         <select id="type" x-model="currentProject.type" required>
-                            <option value="default">default.tex</option>
+                            <template x-for="template in templates" :key="template">
+                                <option :value="template" x-text="template"></option>
+                            </template>
                         </select>
                     </div>
 
@@ -382,13 +384,6 @@
                             class="button warning"
                             @click="closeModal()">
                             <i class="fas fa-wand-magic-sparkles"></i> Edit With Asta
-                        </a>
-                        <a x-show="isEditing && currentProject.slug"
-                            :href="'/latex-editor?slug=' + currentProject.slug"
-                            target="_blank"
-                            class="button warning"
-                            @click="closeModal()">
-                            <i class="fas fa-wand-magic-sparkles"></i> Export With Ender
                         </a>
                          <!-- Placeholder for layout consistency when button isn't shown -->
                          <div x-show="!isEditing || !currentProject.slug" style="visibility: hidden;">&nbsp;</div>
@@ -412,10 +407,12 @@
     <script>
         // Base URL for the API. Adjust if your FastAPI runs on a different port or path.
         const API_BASE_URL = '/db'; // Using relative path assumes FastAPI is serving this HTML
-
+        
         function projectAdmin() {
+            
             return {
                 projects: [],
+                templates: [],
                 loading: true,
                 error: null,
                 isModalOpen: false,
@@ -455,14 +452,20 @@
                 openModal(project = null) {
                     this.modalError = null; // Clear previous modal errors
                     this.isSaving = false; // Reset saving state
+                    
+                    // If we have no templates yet, fetch them
+                    if (this.templates.length === 0) {
+                        this.fetchTemplates();
+                    }
+                    
                     if (project) {
                         // Editing existing project
                         this.isEditing = true;
                         // Create a copy to avoid modifying the list directly
                         this.currentProject = { ...project };
-                         // Ensure all potential fields exist, even if null/undefined from API
-                         this.currentProject.description = this.currentProject.description || '';
-                         this.currentProject.type = this.currentProject.type || 'default';
+                        // Ensure all potential fields exist, even if null/undefined from API
+                        this.currentProject.description = this.currentProject.description || '';
+                        this.currentProject.type = this.currentProject.type || (this.templates.length > 0 ? this.templates[0] : 'default.tex');
                         this.originalSlug = project.slug; // Store original slug for PUT request
                     } else {
                         // Creating new project
@@ -471,17 +474,17 @@
                             title: '',
                             slug: '',
                             description: '',
-                            ai_notes: null, // Keep these as null/undefined for creation if optional
+                            ai_notes: null,
                             markdown: null,
-                            latex:null,
+                            latex: null,
                             thumb: null,
                             metadata: null,
-                            type: 'default.tex' // Set default type
+                            type: this.templates.length > 0 ? this.templates[0] : 'default.tex' // Set default from available templates
                         };
-                         this.originalSlug = '';
+                        this.originalSlug = '';
                     }
                     this.isModalOpen = true;
-                     // Focus the first input field when modal opens
+                    // Focus the first input field when modal opens
                     this.$nextTick(() => {
                         const firstInput = document.getElementById('title');
                         if(firstInput) firstInput.focus();
@@ -556,6 +559,19 @@
                     }
                 },
 
+                async fetchTemplates() {
+                    try {
+                        const response = await fetch(`/templates`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        this.templates = data.templates || [];
+                    } catch (e) {
+                        console.error('Error fetching templates:', e);
+                        this.templates = ['default.tex']; // Fallback option
+                    }
+                },
                 async deleteProject(slug) {
                      this.error = null; // Clear general errors
                     try {
@@ -577,6 +593,7 @@
                         this.error = `Failed to delete project: ${e.message}.`;
                     }
                 }
+                
             }
         }
     </script>

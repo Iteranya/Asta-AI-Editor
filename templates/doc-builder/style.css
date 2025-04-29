@@ -1,24 +1,24 @@
-/* Dark Red Theme - Modern Markdown Editor */
+/* Minimalist Dark Red Theme - Modern Markdown Editor */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
 
 :root {
     --bg-primary: #0f0f0f;
-    --bg-secondary: #1a1a1a;
-    --bg-tertiary: #252525;
+    --bg-secondary: #141414;
+    --bg-tertiary: #1d1d1d;
     --text-primary: #e0e0e0;
     --text-secondary: #aaaaaa;
     --accent-primary: #ff3a3a;
     --accent-secondary: #ff5252;
     --accent-success: #4caf50;
     --accent-error: #ff1744;
-    --border-color: #333333;
+    --border-color: #222222;
     --shadow-color: rgba(0, 0, 0, 0.5);
-    --scrollbar-thumb: #444444;
+    --scrollbar-thumb: #333333;
     --scrollbar-thumb-hover: #ff3a3a;
     --font-primary: 'Poppins', sans-serif;
     --font-code: 'Fira Code', monospace;
-    --sidebar-width: 300px;
-    --sidebar-width-collapsed: 60px;
+    --sidebar-width: 250px;
+    --sidebar-width-collapsed: 50px;
 }
 
 ::selection {
@@ -26,16 +26,18 @@
     color: var(--bg-secondary);
 }
 
-body {
-    font-family: var(--font-primary);
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
     min-height: 100vh;
     overflow-x: hidden;
     transition: padding-left 0.3s ease;
@@ -45,7 +47,27 @@ body {
 .app-container {
     display: flex;
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Scrollbar styling for all elements */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* Sidebar Styles */
@@ -56,8 +78,6 @@ body {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 0;
-    box-shadow: 5px 0 15px var(--shadow-color);
     position: fixed;
     top: 0;
     left: 0;
@@ -71,10 +91,9 @@ body {
 }
 
 .sidebar-content {
-    padding: 25px;
+    padding: 15px;
     overflow-y: auto;
     flex-grow: 1;
-    box-sizing: border-box;
     opacity: 1;
     transition: opacity 0.3s ease;
 }
@@ -84,43 +103,23 @@ body {
     pointer-events: none;
 }
 
-/* Scrollbar for sidebar */
-.sidebar-content::-webkit-scrollbar {
-    width: 10px;
-}
-.sidebar-content::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: 10px;
-}
-.sidebar-content::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 10px;
-    border: 2px solid var(--bg-secondary);
-}
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
-}
-
 .sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 25px;
-    background-color: rgba(26, 26, 26, 0.9);
+    padding: 12px 15px;
+    background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    backdrop-filter: blur(5px);
-    z-index: 1;
-    min-height: 64px;
-    box-sizing: border-box;
+    min-height: 50px;
 }
 
 .sidebar-title {
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 600;
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     overflow: hidden;
     white-space: nowrap;
     opacity: 1;
@@ -132,7 +131,7 @@ body {
 }
 
 .sidebar-title i {
-    font-size: 1.1em;
+    font-size: 1em;
     color: var(--accent-secondary);
 }
 
@@ -140,12 +139,12 @@ body {
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-size: 1.4em;
+    font-size: 1.2em;
     cursor: pointer;
-    padding: 5px;
+    padding: 3px;
     transition: color 0.3s ease, transform 0.3s ease;
     position: absolute;
-    right: 15px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -162,26 +161,24 @@ body {
 /* Sidebar textarea */
 #sidebar-textarea {
     width: 100%;
-    height: 200px;
-    margin-top: 20px;
+    height: 180px;
+    margin-top: 15px;
     border: none;
-    padding: 15px;
+    padding: 10px;
     font-family: var(--font-code);
     font-size: 14px;
     line-height: 1.6;
     resize: vertical;
-    background-color: #141414;
+    background-color: var(--bg-tertiary);
     color: var(--text-primary);
-    box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
 #sidebar-textarea:focus {
     border-color: var(--accent-secondary);
-    box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.2);
 }
 
 #sidebar-textarea::placeholder {
@@ -195,59 +192,32 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
     padding-left: var(--sidebar-width);
     transition: padding-left 0.3s ease;
-    width: calc(100% - var(--sidebar-width));
-    min-height: 100vh; /* Allow scrolling */
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .main-content.sidebar-collapsed {
     padding-left: var(--sidebar-width-collapsed);
-    width: calc(100% - var(--sidebar-width-collapsed));
 }
 
 .main-container {
     display: flex;
-    width: 98%; /* Wider for more space */
-    max-width: 2000px; /* Even larger max-width */
-    height: 85vh; /* Fixed height to allow scrolling to AI section */
+    width: 100%;
+    height: 90vh; /* Adjusted for more space */
     background-color: var(--bg-secondary);
-    box-shadow: 0 15px 40px var(--shadow-color);
-    border-radius: 15px;
     overflow: hidden;
-    border: 1px solid var(--border-color);
-    margin-top: 2vh;
-    margin-bottom: 3vh;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .pane {
     flex: 1;
-    padding: 35px;
     overflow-y: auto;
-    box-sizing: border-box;
     position: relative;
     transition: background-color 0.3s ease;
-    height: 100%; /* Full height */
-}
-
-.pane::-webkit-scrollbar {
-    width: 12px;
-}
-
-.pane::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: 10px;
-}
-
-.pane::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 10px;
-    border: 3px solid var(--bg-secondary);
-}
-
-.pane::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
+    height: 100%;
 }
 
 .left-pane {
@@ -261,91 +231,83 @@ body {
 
 .pane-title {
     position: sticky;
-    top: -35px;
-    padding: 18px 35px;
-    background-color: inherit;
+    top: 0;
+    padding: 10px 15px;
+    background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    margin: -35px -35px 25px -35px;
-    font-size: 1.2em;
+    font-size: 0.9em;
     font-weight: 600;
     color: var(--text-primary);
     z-index: 10;
     display: flex;
     align-items: center;
-    gap: 12px;
-    backdrop-filter: blur(5px);
-    background-color: rgba(26, 26, 26, 0.9);
+    gap: 8px;
+    height: 40px;
 }
 
 .pane-title i {
-    font-size: 1.1em;
+    font-size: 1em;
     color: var(--accent-primary);
 }
 
 textarea#markdown-input {
     width: 100%;
-    height: calc(100% - 90px); /* Account for title */
+    height: calc(100% - 40px); /* Account for title */
     border: none;
-    padding: 20px;
+    padding: 15px;
     font-family: var(--font-code);
     font-size: 15px;
     line-height: 1.7;
     resize: none;
-    background-color: #141414;
+    background-color: var(--bg-secondary);
     color: var(--text-primary);
-    box-sizing: border-box;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
     outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-textarea#markdown-input:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 4px rgba(255, 58, 58, 0.2);
+    border: none;
 }
 
 #markdown-output {
     line-height: 1.8;
     color: var(--text-primary);
     word-wrap: break-word;
-    min-height: calc(100% - 90px);
+    height: calc(100% - 40px);
+    padding: 15px;
+    overflow-y: auto;
 }
 
 /* Enhanced Markdown specific styles */
 #markdown-output h1, #markdown-output h2 {
     border-bottom: 2px solid var(--accent-primary);
-    padding-bottom: 0.4em;
-    margin-top: 1.8em;
-    margin-bottom: 1em;
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
     color: var(--accent-secondary);
 }
 
 #markdown-output h3, #markdown-output h4, #markdown-output h5, #markdown-output h6 {
-    margin-top: 1.6em;
-    margin-bottom: 0.9em;
+    margin-top: 1.3em;
+    margin-bottom: 0.7em;
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.3em;
-    line-height: 1.4;
+    padding-bottom: 0.2em;
+    line-height: 1.3;
 }
 
-#markdown-output h1 { font-size: 2.2em; font-weight: 700; }
-#markdown-output h2 { font-size: 1.9em; font-weight: 600; }
-#markdown-output h3 { font-size: 1.6em; font-weight: 600; }
-#markdown-output h4 { font-size: 1.3em; font-weight: 600; }
-#markdown-output h5 { font-size: 1.15em; font-weight: 600; }
+#markdown-output h1 { font-size: 2em; font-weight: 700; }
+#markdown-output h2 { font-size: 1.7em; font-weight: 600; }
+#markdown-output h3 { font-size: 1.4em; font-weight: 600; }
+#markdown-output h4 { font-size: 1.2em; font-weight: 600; }
+#markdown-output h5 { font-size: 1.1em; font-weight: 600; }
 #markdown-output h6 { font-size: 1em; color: var(--text-secondary); font-weight: 600; }
 
 #markdown-output p {
-    margin-bottom: 1.3em;
+    margin-bottom: 1em;
 }
 
 #markdown-output a {
     color: var(--accent-primary);
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.3s ease, text-decoration 0.3s ease, background-color 0.3s ease;
+    transition: color 0.3s ease, background-color 0.3s ease;
     padding: 0.1em 0.2em;
     border-radius: 3px;
 }
@@ -353,27 +315,25 @@ textarea#markdown-input:focus {
 #markdown-output a:hover {
     color: var(--bg-secondary);
     background-color: var(--accent-primary);
-    text-decoration: none;
 }
 
 #markdown-output code:not(pre code) {
     background-color: var(--bg-secondary);
-    padding: 0.3em 0.5em;
-    border-radius: 5px;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
     font-family: var(--font-code);
-    font-size: 0.95em;
+    font-size: 0.9em;
     color: var(--accent-secondary);
     border: 1px solid var(--border-color);
 }
 
 #markdown-output pre {
-    background-color: #141414;
+    background-color: #0a0a0a;
     color: var(--text-primary);
-    padding: 1.2em;
-    border-radius: 10px;
+    padding: 1em;
+    border-radius: 6px;
     overflow-x: auto;
-    margin-bottom: 1.5em;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.2em;
     border: 1px solid var(--border-color);
     position: relative;
 }
@@ -381,15 +341,14 @@ textarea#markdown-input:focus {
 /* Copy button for code blocks */
 #markdown-output pre .copy-code-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 5px;
+    right: 5px;
     background-color: var(--bg-tertiary);
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 5px 10px;
-    font-size: 0.8em;
-    font-family: var(--font-primary);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.7em;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
@@ -412,25 +371,22 @@ textarea#markdown-input:focus {
 #markdown-output pre code.hljs {
     background-color: transparent;
     padding: 0;
-    border-radius: 0;
     font-family: var(--font-code);
-    font-size: 0.95em;
-    line-height: 1.6;
-    color: inherit;
+    font-size: 0.9em;
+    line-height: 1.5;
 }
 
 #markdown-output blockquote {
-    border-left: 6px solid var(--accent-primary);
-    padding: 15px 25px;
-    margin: 1.8em 0;
-    background-color: rgba(26, 26, 26, 0.6);
+    border-left: 4px solid var(--accent-primary);
+    padding: 10px 15px;
+    margin: 1.5em 0;
+    background-color: rgba(20, 20, 20, 0.6);
     color: var(--text-secondary);
-    font-style: normal;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 4px 4px 0;
 }
 
 #markdown-output blockquote p {
-    margin-bottom: 0.6em;
+    margin-bottom: 0.5em;
 }
 
 #markdown-output blockquote p:last-child {
@@ -438,18 +394,17 @@ textarea#markdown-input:focus {
 }
 
 #markdown-output ul, #markdown-output ol {
-    margin-left: 30px;
-    margin-bottom: 1.3em;
-    padding-left: 20px;
+    margin-left: 20px;
+    margin-bottom: 1em;
+    padding-left: 15px;
 }
 
 #markdown-output ul li, #markdown-output ol li {
-    margin-bottom: 0.7em;
+    margin-bottom: 0.5em;
 }
 
 #markdown-output ul li::marker {
     color: var(--accent-primary);
-    font-size: 1.1em;
 }
 
 #markdown-output ol li::marker {
@@ -461,15 +416,15 @@ textarea#markdown-input:focus {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: 1.8em;
+    margin-bottom: 1.5em;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
 }
 
 #markdown-output th, #markdown-output td {
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 15px;
+    padding: 8px 12px;
     text-align: left;
 }
 
@@ -485,7 +440,7 @@ textarea#markdown-input:focus {
 }
 
 #markdown-output tr:nth-child(even) td {
-    background-color: rgba(37, 37, 37, 0.5);
+    background-color: rgba(29, 29, 29, 0.5);
 }
 
 #markdown-output tr:hover td {
@@ -495,9 +450,8 @@ textarea#markdown-input:focus {
 #markdown-output img {
     max-width: 100%;
     height: auto;
-    border-radius: 10px;
-    margin: 1.2em 0;
-    box-shadow: 0 5px 15px var(--shadow-color);
+    border-radius: 6px;
+    margin: 1em 0;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -506,9 +460,9 @@ textarea#markdown-input:focus {
 
 #markdown-output hr {
     border: 0;
-    height: 2px;
+    height: 1px;
     background-image: linear-gradient(to right, rgba(51, 51, 51, 0), var(--accent-primary), rgba(51, 51, 51, 0));
-    margin: 2.5em 0;
+    margin: 2em 0;
 }
 
 /* Placeholder text style */
@@ -520,43 +474,32 @@ textarea#markdown-input:focus {
 
 /* AI Generation Section */
 .ai-section {
-    width: 98%;
-    max-width: 2000px;
-    margin-bottom: 5vh;
-    padding: 25px;
+    height: 10vh;
+    width: 100%;
     background-color: var(--bg-secondary);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px var(--shadow-color);
-    border: 1px solid var(--border-color);
-    box-sizing: border-box;
+    display: flex;
+    padding: 0;
 }
 
 .ai-section form {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    width: 100%;
+    height: 100%;
 }
 
 .ai-section textarea#ai-prompt {
-    width: 100%;
-    min-height: 100px;
-    padding: 15px;
+    flex-grow: 1;
+    height: 100%;
+    padding: 12px 15px;
     font-family: var(--font-primary);
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
-    resize: vertical;
-    background-color: #141414;
+    resize: none;
+    background-color: var(--bg-secondary);
     color: var(--text-primary);
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+    border: none;
+    border-right: 1px solid var(--border-color);
     outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.ai-section textarea#ai-prompt:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 4px rgba(255, 58, 58, 0.2);
 }
 
 .ai-section textarea#ai-prompt::placeholder {
@@ -565,33 +508,24 @@ textarea#markdown-input:focus {
 }
 
 .ai-section button {
-    padding: 12px 30px;
+    padding: 0 20px;
     font-family: var(--font-primary);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--bg-secondary);
     background-color: var(--accent-primary);
     border: none;
-    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+    transition: background-color 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    align-self: flex-end;
-    box-shadow: 0 4px 10px rgba(255, 58, 58, 0.3);
+    width: 200px;
 }
 
 .ai-section button:hover:not(:disabled) {
-    background-color: #ff5252;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 58, 58, 0.4);
-}
-
-.ai-section button:active:not(:disabled) {
-    transform: translateY(0px);
-    box-shadow: 0 3px 8px rgba(255, 58, 58, 0.3);
+    background-color: var(--accent-secondary);
 }
 
 .ai-section button:disabled {
@@ -610,32 +544,36 @@ textarea#markdown-input:focus {
     100% { transform: rotate(360deg); }
 }
 
-/* Notifications */
 .notification-container {
     position: fixed;
-    bottom: 30px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1001;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse; /* Newest notifications appear at the bottom */
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    pointer-events: none;
+    width: auto;
+    max-width: 100%;
 }
 
 .notification {
+    position: relative;
     background-color: rgba(76, 175, 80, 0.95);
     color: #0f0f0f;
-    padding: 12px 25px;
-    border-radius: 25px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    padding: 8px 15px;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
     opacity: 0;
-    transform: translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease-out;
-    margin-top: auto;
+    transform: translateX(20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: auto; /* Make notification clickable */
+    max-width: 300px;
 }
 
 .notification.error {
@@ -644,14 +582,67 @@ textarea#markdown-input:focus {
 }
 
 .notification.show {
-    transform: translateY(0);
+    transform: translateX(0);
     opacity: 1;
 }
 
 .notification.hide {
-    transform: translateY(-10px) scale(0.95);
+    transform: translateX(10px);
     opacity: 0;
-    transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+/* Top right action button */
+.top-right-button-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 200;
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+  
+.action-button:hover {
+    background-color: var(--accent-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.collapsed {
+        width: 0;
+    }
+    
+    .main-content {
+        padding-left: 0;
+    }
+    
+    .main-content.sidebar-collapsed {
+        padding-left: 0;
+    }
+    
+    .ai-section button {
+        width: 120px;
+        font-size: 12px;
+        padding: 0 10px;
+    }
 }
 
 /* Rewrite Modal */
@@ -775,37 +766,8 @@ textarea#markdown-input:focus {
     animation: spin 1s linear infinite;
 }
 
-/* Add this to your CSS file */
-.top-right-button-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 200;
-  }
-  
-  .action-button {
-    padding: 10px 15px;
-    background-color: var(--accent-primary);
-    color: var(--bg-secondary);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: var(--font-primary);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 10px rgba(255, 58, 58, 0.3);
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-  }
-  
-  .action-button:hover {
-    background-color: var(--accent-secondary);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 58, 58, 0.4);
-  }
-  
-  .action-button:active {
-    transform: translateY(0px);
-    box-shadow: 0 3px 8px rgba(255, 58, 58, 0.3);
-  }
+/* Add this keyframes rule */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

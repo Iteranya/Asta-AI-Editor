@@ -35,3 +35,41 @@ async def upload_media(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     return {"status": "success", "filename": file.filename}
+
+
+@router.get("/templates")
+async def get_latex_template_list():
+    template_path = "latex/"
+    # List all files in the template directory
+    try:
+        # Using os.listdir to get all files in the directory
+        import os
+        if not os.path.exists(template_path):
+            return {"error": "Template directory not found"}
+        
+        templates = os.listdir(template_path)
+        # Filter out any non-LaTeX files if needed
+        # latex_templates = [t for t in templates if t.endswith('.tex')]
+        
+        return {"templates": templates}
+    except Exception as e:
+        # Return error with appropriate status code
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Error retrieving templates: {str(e)}")
+
+@router.get("/templates/{filename:path}", response_class=FileResponse)
+async def get_latex_template(filename: str):
+    file_path = "latex/" + filename
+    
+    # Verify file exists and return it
+    import os
+    if not os.path.isfile(file_path):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"Template '{filename}' not found")
+    
+    # Return the file for download
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/x-tex"  # MIME type for LaTeX files
+    )

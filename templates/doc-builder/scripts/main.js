@@ -1,12 +1,12 @@
 // main.js
 // Main entry point that initializes all modules
 
-import { MarkdownEditor,toggleSidebar } from './editor-core.js';
+import { MarkdownEditor, toggleSidebar } from './editor-core.js';
 import { NotificationSystem } from './notification-system.js';
 import { ScrollSynchronizer } from './scroll-sync.js';
 import { AiGenerator } from './ai-integration.js';
 import { setupImagePasteHandler } from './media-handler.js';
-import { updateProject,getProject } from './db-integration.js';
+import { ButtonHandlers } from './button-handler.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the editor
@@ -16,42 +16,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputElement = document.getElementById('markdown-input');
     const outputElement = document.getElementById('markdown-output');
     const sidebarToggle = document.getElementById('sidebar-toggle');
-    const side_panel =  document.getElementById('sidebar-textarea');
+    const side_panel = document.getElementById('sidebar-textarea');
     const slug = document.getElementById('slug-container').textContent;
+    
     setupImagePasteHandler();
 
-    const actionButton = document.getElementById('action-button');
+    // Initialize buttons
+    initializeButtons(slug, inputElement, side_panel);
 
-    if (actionButton) {
-        if (slug == null || slug.trim() === "") {
-            actionButton.style.display = 'none'; // Hide the button
-        } else {
-            actionButton.addEventListener('click', function() {
-                getProject(slug)
-                    .then(project_data => {
-                        project_data.ai_notes = side_panel.value;
-                        project_data.markdown = inputElement.value;
-                        updateProject(slug, project_data)
-                            .then(result => {
-                                console.log(result)
-                                NotificationSystem.show('Project updated successfully!', 'success');
-                            })
-                            .catch(error => {
-                                console.error("Error updating project:", error);
-                                NotificationSystem.show(`Failed to update project: ${error.message}`, 'error');
-                            });
-                    })
-                    .catch(error => {
-                        console.error("Error fetching project:", error);
-                        NotificationSystem.show(`Failed to load project: ${error.message}`, 'error');
-                    });
-            });
-        }
-    }
-
-    
     // Initialize AI generation
     const aiGenerator = new AiGenerator(editor);
     sidebarToggle.addEventListener('click', toggleSidebar);
     console.log('Markdown editor initialized successfully!');
 });
+
+function initializeButtons(slug, inputElement, sidePanel) {
+    const actionButton = document.getElementById('action-button');
+    const projectButton = document.getElementById('project-button');
+    const latexButton = document.getElementById('latex-button');
+
+    // Handle action button
+    if (actionButton) {
+        
+        if (slug == null || slug == "") {
+            actionButton.style.display = 'none';
+            projectButton.style.display = 'none';
+            latexButton.style.display = 'none';
+        } else {
+            actionButton.addEventListener('click', () => 
+                ButtonHandlers.handleActionButton(slug, inputElement.value, sidePanel.value)
+            );
+        }
+    }
+
+    // Handle project button
+    if (projectButton) {
+        projectButton.addEventListener('click', () => 
+            ButtonHandlers.handleProjectButton(slug, inputElement.value, sidePanel.value)
+        );
+    }
+
+    // Handle latex button
+    if (latexButton) {
+        latexButton.addEventListener('click', () => 
+            ButtonHandlers.handleLatexButton(slug, inputElement.value, sidePanel.value)
+        );
+    }
+}

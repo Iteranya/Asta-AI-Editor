@@ -29,7 +29,7 @@ export function setupImagePasteHandler() {
           const uploadEndpoint = slug ? '/files' : '/media';
 
           try {
-            showNotification('Uploading image...', 'info');
+            // showNotification('Uploading image...', 'info');
             
             const formData = new FormData();
             formData.append('file', new File([file], finalFilename, { type: file.type }));
@@ -55,10 +55,10 @@ export function setupImagePasteHandler() {
             markdownInput.selectionStart = markdownInput.selectionEnd = cursorPos + imageMarkdown.length;
             markdownInput.dispatchEvent(new Event('input'));
             
-            showNotification('Image uploaded successfully!', 'success');
+            // showNotification('Image uploaded successfully!', 'success');
           } catch (error) {
             console.error('Error uploading image:', error);
-            showNotification('Failed to upload image: ' + error.message, 'error');
+            // showNotification('Failed to upload image: ' + error.message, 'error');
           }
         }
       }
@@ -95,24 +95,24 @@ function sanitizeFilename(filename) {
 }
 
 
-  function showNotification(message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-      <div class="notification-content">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-        <span>${message}</span>
-      </div>
-    `;
+  // function showNotification(message, type = 'info') {
+  //   const container = document.getElementById('notification-container');
+  //   const notification = document.createElement('div');
+  //   notification.className = `notification ${type}`;
+  //   notification.innerHTML = `
+  //     <div class="notification-content">
+  //       <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+  //       <span>${message}</span>
+  //     </div>
+  //   `;
     
-    container.appendChild(notification);
+  //   container.appendChild(notification);
     
-    // Remove after 3 seconds
-    setTimeout(() => {
-      notification.classList.add('fade-out');
-      setTimeout(() => {
-        container.removeChild(notification);
-      }, 300);
-    }, 3000);
-  }
+  //   // Remove after 3 seconds
+  //   setTimeout(() => {
+  //     notification.classList.add('fade-out');
+  //     setTimeout(() => {
+  //       container.removeChild(notification);
+  //     }, 300);
+  //   }, 3000);
+  // }
