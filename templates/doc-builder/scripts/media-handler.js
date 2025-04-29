@@ -17,8 +17,12 @@ export function setupImagePasteHandler() {
           const file = items[i].getAsFile();
           if (!file) continue;
           
+          // Sanitize the original filename to make it slug-friendly
+          const originalName = file.name || 'image';
+          const sanitizedName = sanitizeFilename(originalName);
+          
           const timestamp = new Date().getTime();
-          const filename = `pasted_image_${timestamp}.${file.name.split('.').pop() || 'png'}`;
+          const filename = `${sanitizedName}-${timestamp}`;
           
           // Build final filename with slug if exists
           const finalFilename = slug ? `${slug}/${filename}` : filename;
@@ -42,7 +46,7 @@ export function setupImagePasteHandler() {
             const data = await response.json();
             
             const cursorPos = markdownInput.selectionStart;
-            const imageMarkdown = `![${filename}](${uploadEndpoint}/${data.filename})`;
+            const imageMarkdown = `![${sanitizedName}](${uploadEndpoint}/${data.filename})`;
             
             const textBefore = markdownInput.value.substring(0, cursorPos);
             const textAfter = markdownInput.value.substring(cursorPos);
@@ -60,6 +64,34 @@ export function setupImagePasteHandler() {
       }
     }
   });
+}
+
+function sanitizeFilename(filename) {
+  // Get the base name without extension
+  const parts = filename.split('.');
+  const extension = parts.length > 1 ? '.' + parts.pop() : '';
+  let baseName = parts.join('.');
+  
+  // Convert to lowercase and replace spaces and unwanted chars with hyphens
+  baseName = baseName.toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens and underscores
+    .replace(/[\s_]+/g, '-')   // Replace spaces and underscores with hyphens
+    .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+    .trim()                    // Trim whitespace from both ends
+    .replace(/^-+|-+$/g, '');  // Remove leading and trailing hyphens
+  
+  // Limit the length of the base name (adjust as needed)
+  const maxLength = 50;
+  if (baseName.length > maxLength) {
+    baseName = baseName.substring(0, maxLength);
+  }
+  
+  // Ensure we have at least some filename
+  if (!baseName) {
+    baseName = 'image';
+  }
+  
+  return baseName + extension;
 }
 
 

@@ -1,0 +1,157 @@
+\documentclass[12pt, a4paper, onecolumn, oneside]{report}
+\usepackage[bahasa]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{tocloft} % Used for some ToC settings, but titletoc is dominant for entries
+\usepackage{titletoc} % Add this package for more TOC customization
+\usepackage{mathptmx} % Times New Roman font
+
+% Margin settings
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=2.5cm
+}
+
+% Chapter numbering in Arabic numerals
+\renewcommand{\thechapter}{\arabic{chapter}}
+
+% Section and subsection numbering in Arabic numerals, based on Arabic chapter number
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+% --- TITLES FORMATTING ---
+% This section defines how titles appear IN THE DOCUMENT body.
+
+% Chapter title format: Hide "BAB 1" / "Chapter 1" prefix and number.
+% The format is applied, the label part is empty {}, separator is 0pt,
+% and the code before the title {#1} just sets the font.
+\titleformat{\chapter}[display]
+{\normalfont\bfseries\centering\fontsize{14}{16.8}\selectfont} % Format for the whole title block (centering, font size, bold)
+{} % Empty label part - Hides "BAB 1" / "Chapter 1" and the Arabic numeral
+{0pt} % Separator between label and title - Set to 0pt since label is empty
+{\fontsize{14}{16.8}\selectfont} % Code executed *before* the title text {#1} - Keep font settings
+
+% Adjust chapter spacing to remove extra vertical space (You had this, keeping it)
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+% Section title format (Keeping as you had it - will now show 1.1, 1.2 etc.)
+\titleformat{\section}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesection}{1em}{}
+
+% Subsection title format (Keeping as you had it - will now show 1.1.1, 1.1.2 etc.)
+\titleformat{\subsection}
+{\normalfont\bfseries\fontsize{12}{14.4}\selectfont}
+{\thesubsection}{1em}{}
+
+% Line spacing 1.15 (Keeping as you had it)
+\setstretch{1.15}
+
+% --- TABLE OF CONTENTS, LIST OF FIGURES, and LIST OF TABLES FORMATTING ---
+% This section defines how entries appear IN THE TOC/LOF/LOT pages.
+
+\usepackage{etoolbox}
+\renewcommand{\cfttoctitlefont}{\hfil\Large\bfseries} % Center ToC title
+\renewcommand{\cftaftertoctitle}{\hfil\par} % Add space/newline after ToC title
+\renewcommand{\cftloftitlefont}{\hfil\Large\bfseries} % Center LoF title
+\renewcommand{\cftafterloftitle}{\hfil\par} % Add space/newline after LoF title
+\renewcommand{\cftlottitlefont}{\hfil\Large\bfseries} % Center LoT title
+\renewcommand{\cftafterlottitle}{\hfil\par} % Add space/newline after LoT title
+
+% Dotted leaders settings (Keeping as you had it)
+\makeatletter
+\renewcommand{\@dotsep}{2}
+\makeatother
+
+% Customize TOC entries with dotted leaders using titletoc
+
+% Chapter entries in TOC: Hide the Arabic numeral label. Fix squishing.
+\titlecontents{chapter}[0pt] % Left margin for the entry line (0pt for top level)
+{\addvspace{0pt}\bfseries} % Format for the whole line (bold, no extra vertical space before)
+{} % Empty label part - Hides "1", "2", etc. from the TOC entry
+{} % Code before the title text - Set to empty {}
+{\titlerule*[0.5pc]{.}\contentspage} % Code after the title text (dotted leader and page number)
+
+% Section entries in TOC: Show 1.1, 1.2 etc. Fix squishing by increasing label width.
+% Adjusted width slightly as Arabic numbers can be wider than Roman ones for same value,
+% but 2em should still be sufficient for numbers like 1.10 or 10.1.
+\titlecontents{section}[1em] % Left margin (indented)
+{\addvspace{0pt}} % Format for the whole line (no extra vertical space before)
+{\contentslabel{2em}} % Label part - Shows "1.1", "1.2", etc. Allocate 2em width for the label.
+{} % Code before the title text - Set to empty {}
+{\titlerule*[0.5pc]{.}\contentspage} % Code after the title text (dotted leader and page number)
+
+% Subsection entries in TOC: Show 1.1.1, 1.1.2 etc. Fix squishing by increasing label width.
+% Adjusted width slightly for Arabic numbers. 3em should be sufficient for 1.1.10 or 10.1.1.
+\titlecontents{subsection}[2em] % Left margin (more indented)
+{\addvspace{0pt}} % Format for the whole line (no extra vertical space before)
+{\contentslabel{3em}} % Label part - Shows "1.1.1", "1.1.2", etc. Allocate 3em width for the label.
+{} % Code before the title text - Set to empty {}
+{\titlerule*[0.5pc]{.}\contentspage} % Code after the title text (dotted leader and page number)
+
+% Include up to subsection level in TOC
+\setcounter{tocdepth}{3}
+
+
+% --- END OF PREAMBLE ---
+\begin{document}
+
+% Halaman Sampul
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\LARGE\bfseries [JUDUL] \par}
+    \vspace{2cm}
+    {\LARGE\bfseries [SUB JUDUL] \par}
+    \vspace{2cm}
+    {\Large LAPORAN KERJA PRAKTIK \par}
+    \vspace{2cm}
+    {\large Disusun oleh:\par}
+    {\large\bfseries [PENULIS]\par}
+    {\large [NIM]\par}
+    \vfill
+    \includegraphics[width=150]{ placeholder_takodachi.png } % Logo universitas
+    \vfill
+    {\large [PRODI]\par}
+    {\large [DEPARTEMEN]\par}
+    {\large [FAKULTAS]\par}
+    {\large [UNIVERSITAS]\par}
+    {\large [TAHUN]\par}
+\end{titlepage}
+% Daftar Isi
+\tableofcontents
+\newpage
+
+% Daftar Tabel
+\listoftables
+\newpage
+
+% Daftar Gambar
+\listoffigures
+\newpage
+
+% % Daftar Lampiran
+% \chapter*{DAFTAR LAMPIRAN}
+% \addcontentsline{toc}{chapter}{DAFTAR LAMPIRAN}
+% \begin{center}
+%     \begin{tabular}{cll}
+%         \textbf{No.} & \textbf{Judul Lampiran} & \textbf{Halaman} \\
+%         \hline
+%         {% for attachment in attachments %}
+%         {{ loop.index }} & {{ attachment.title }} & {{ attachment.page }} \\
+%         {% endfor %}
+%     \end{tabular}
+% \end{center}
+% \newpage
+
+\clearpage
+\pagenumbering{arabic}

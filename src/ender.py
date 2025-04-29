@@ -28,7 +28,7 @@ class MarkdownToLatexConverter:
     def convert_markdown(self):
         """Convert markdown content to LaTeX."""
         content = self.markdown_content
-
+        content = self.escape_percent_signs(content)
         content = self.convert_headings(content)
         content = self.convert_images(content)
         content = self.convert_tables(content)
@@ -263,3 +263,50 @@ class MarkdownToLatexConverter:
         # Write to output file
         with open(self.output_path, 'w', encoding='utf-8') as f:
             f.write(final_content)
+
+    def escape_percent_signs(self,latex_content):
+        """
+        Properly escapes percent signs in LaTeX content.
+        
+        In LaTeX, a percent sign (%) indicates a comment when not escaped.
+        To display an actual percent sign, it needs to be escaped as \%.
+        
+        Args:
+            latex_content (str): The LaTeX content to process
+            
+        Returns:
+            str: LaTeX content with properly escaped percent signs
+        """
+        # Skip escaping inside code blocks
+        lines = latex_content.split('\n')
+        result = []
+        in_code_block = False
+        
+        for line in lines:
+            if line.strip().startswith('```'):
+                in_code_block = not in_code_block
+                result.append(line)
+                continue
+                
+            if in_code_block:
+                result.append(line)
+                continue
+                
+            # Skip already properly escaped percent signs (\%)
+            # and replace unescaped percent signs
+            processed_line = ''
+            i = 0
+            while i < len(line):
+                if line[i:i+2] == '\\%':
+                    processed_line += '\\%'
+                    i += 2
+                elif line[i] == '%':
+                    processed_line += '\\%'
+                    i += 1
+                else:
+                    processed_line += line[i]
+                    i += 1
+                    
+            result.append(processed_line)
+            
+        return '\n'.join(result)
