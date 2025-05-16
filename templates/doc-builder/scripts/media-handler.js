@@ -22,7 +22,7 @@ export function setupImagePasteHandler() {
           const sanitizedName = sanitizeFilename(originalName);
           
           const timestamp = new Date().getTime();
-          const filename = `${sanitizedName}-${timestamp}`;
+          const filename = `${sanitizedName}-${timestamp}.png`;
           
           // Build final filename with slug if exists
           const finalFilename = slug ? `${slug}/${filename}` : filename;
