@@ -5,3 +5,4 @@ config.json
 projects.db
 *.db
 *.exe
+latex/slip_gaji.tex

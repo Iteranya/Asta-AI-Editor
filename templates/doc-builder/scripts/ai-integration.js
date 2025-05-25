@@ -104,7 +104,6 @@ export class AiGenerator {
                 if (eventData.done) {
                     eventSource.close();
                     this.resetFormState();
-                    this.promptTextarea.value = ''; // Clear prompt on success
                     
                     // Show completion notification
                     NotificationSystem.show('✧･ﾟ:* AI Generation Complete! *:･ﾟ✧', 'success');
