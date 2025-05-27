@@ -46,7 +46,6 @@ export class MarkdownEditor {
         configureMarked();
         
         // Set up event listeners
-        this.markdownInput.addEventListener('input', () => this.updatePreview());
         this.isDirty = false;
 
         this.markdownInput.addEventListener('input', () => {
