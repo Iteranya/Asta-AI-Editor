@@ -8,16 +8,12 @@ import { AiGenerator } from './ai-integration.js';
 import { setupImagePasteHandler } from './media-handler.js';
 import { ButtonHandlers } from './button-handler.js';
 
+// Global variable to track unsaved changes
+let hasUnsavedChanges = false;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the editor
     const editor = new MarkdownEditor();
-    editor.addEventListener('beforeunload', function (e) {
-        if (editor?.isDirty) {
-            e.preventDefault();
-            e.returnValue = ''; // Required for Chrome
-            return ''; // Required for Firefox
-        }
-    });
     
     // Initialize scroll synchronization
     const inputElement = document.getElementById('markdown-input');
@@ -27,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const slug = document.getElementById('slug-container').textContent;
     
     setupImagePasteHandler();
+    
+    // Set up unsaved changes warning
+    setupUnsavedChangesWarning(inputElement, side_panel);
 
     // Initialize buttons
     initializeButtons(slug, inputElement, side_panel);
@@ -37,6 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Markdown editor initialized successfully!');
 });
 
+function setupUnsavedChangesWarning(inputElement, sidePanel) {
+    // Track changes in markdown input
+    inputElement.addEventListener('input', () => {
+        hasUnsavedChanges = true;
+    });
+
+    // Track changes in sidebar panel
+    sidePanel.addEventListener('input', () => {
+        hasUnsavedChanges = true;
+    });
+
+    // Warn before page unload
+    window.addEventListener('beforeunload', (e) => {
+        if (hasUnsavedChanges) {
+            const message = 'You have unsaved changes. Are you sure you want to leave?';
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        }
+    });
+}
+
+function markAsSaved() {
+    hasUnsavedChanges = false;
+}
+
 function initializeButtons(slug, inputElement, sidePanel) {
     const actionButton = document.getElementById('action-button');
     const projectButton = document.getElementById('project-button');
@@ -44,7 +69,6 @@ function initializeButtons(slug, inputElement, sidePanel) {
 
     // Handle action button
     if (actionButton) {
-        
         if (slug == null || slug == "") {
             actionButton.style.display = 'none';
             projectButton.style.display = 'none';
@@ -56,11 +80,16 @@ function initializeButtons(slug, inputElement, sidePanel) {
         }
     }
 
-    // Handle project button
+    // Handle project button with save tracking
     if (projectButton) {
-        projectButton.addEventListener('click', () => 
-            ButtonHandlers.handleProjectButton(slug, inputElement.value, sidePanel.value)
-        );
+        projectButton.addEventListener('click', async () => {
+            try {
+                await ButtonHandlers.handleProjectButton(slug, inputElement.value, sidePanel.value);
+                markAsSaved();
+            } catch (error) {
+                console.error('Project save failed:', error);
+            }
+        });
     }
 
     // Handle latex button
