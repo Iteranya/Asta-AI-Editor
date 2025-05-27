@@ -47,6 +47,17 @@ export class MarkdownEditor {
         
         // Set up event listeners
         this.markdownInput.addEventListener('input', () => this.updatePreview());
+        this.isDirty = false;
+
+        this.markdownInput.addEventListener('input', () => {
+            this.isDirty = true;
+            this.updatePreview();
+        });
+
+        // Optional: Also track sidebar edits
+        this.side_panel.addEventListener('input', () => {
+            this.isDirty = true;
+        });
         const modal = document.createElement('div');
         modal.className = 'rewrite-modal';
         modal.innerHTML = `
