@@ -11,6 +11,13 @@ import { ButtonHandlers } from './button-handler.js';
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the editor
     const editor = new MarkdownEditor();
+    editor.addEventListener('beforeunload', function (e) {
+        if (editor?.isDirty) {
+            e.preventDefault();
+            e.returnValue = ''; // Required for Chrome
+            return ''; // Required for Firefox
+        }
+    });
     
     // Initialize scroll synchronization
     const inputElement = document.getElementById('markdown-input');
